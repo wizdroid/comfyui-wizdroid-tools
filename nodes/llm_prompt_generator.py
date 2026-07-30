@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Tuple
 
 from lib.constants import DEFAULT_OLLAMA_URL
 from lib.ollama_client import collect_models, generate_text
-from lib.prompts import build_system_prompt
+from lib.prompts import build_system_prompt, get_user_prompt_wrapper
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class WizdroidLLMPromptGenerator:
     - **Detail** (0–10): From minimalistic to hyper-detailed 8K quality.
     """
 
-    CATEGORY = "🧙 Wizdroid Tools/LLM"
+    CATEGORY = "🧙 Wizdroid/LLM"
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt",)
     FUNCTION = "generate"
@@ -162,6 +162,9 @@ class WizdroidLLMPromptGenerator:
             max_tokens=target_words,
         )
 
+        # Wrap the user's concept (template from data/prompts/system.json)
+        generation_prompt = get_user_prompt_wrapper().format(concept=user_prompt)
+
         logger.debug(
             "Generating prompt: model=%s, spice=%d, fantasy=%d, detail=%d, temp=%.2f, tokens=%d, seed=%d",
             ollama_model, spice, fantasy, detail, temperature, max_tokens, seed,
@@ -172,7 +175,7 @@ class WizdroidLLMPromptGenerator:
             ollama_url=ollama_url,
             model=ollama_model,
             system=system_prompt,
-            prompt=user_prompt,
+            prompt=generation_prompt,
             temperature=temperature,
             max_tokens=max_tokens,
             seed=seed,

@@ -3,9 +3,12 @@
 Includes:
 - LLM Prompt Generator: Generate image prompts via Ollama with fine-grained
   control over spice, fantasy, and detail levels.
+- LLM Lyrics Generator: ACE-Step 1.5 structured lyrics + tags via Ollama.
+- LLM Text Rewriter: Mode-based rewrite (clean-up, formalize, humanize, pirate,
+  custom instruction, …) via Ollama.
 """
 
-__version__ = "2026.07.01"
+__version__ = "2026.07.30"
 
 import sys
 from pathlib import Path
@@ -56,14 +59,26 @@ _llm_nodes = _import_node_module("llm_prompt_generator")
 LLM_NODE_CLASS_MAPPINGS = _llm_nodes.NODE_CLASS_MAPPINGS
 LLM_DISPLAY_NAME_MAPPINGS = _llm_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
+_lyrics_nodes = _import_node_module("llm_lyrics_generator")
+LYRICS_NODE_CLASS_MAPPINGS = _lyrics_nodes.NODE_CLASS_MAPPINGS
+LYRICS_DISPLAY_NAME_MAPPINGS = _lyrics_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
+_rewrite_nodes = _import_node_module("llm_text_rewriter")
+REWRITE_NODE_CLASS_MAPPINGS = _rewrite_nodes.NODE_CLASS_MAPPINGS
+REWRITE_DISPLAY_NAME_MAPPINGS = _rewrite_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
 # ---------------------------------------------------------------------------
 # Combined mappings for ComfyUI
 # ---------------------------------------------------------------------------
 
 NODE_CLASS_MAPPINGS = {
     **LLM_NODE_CLASS_MAPPINGS,
+    **LYRICS_NODE_CLASS_MAPPINGS,
+    **REWRITE_NODE_CLASS_MAPPINGS,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     **LLM_DISPLAY_NAME_MAPPINGS,
+    **LYRICS_DISPLAY_NAME_MAPPINGS,
+    **REWRITE_DISPLAY_NAME_MAPPINGS,
 }

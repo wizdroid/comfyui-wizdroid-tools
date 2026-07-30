@@ -1,0 +1,58 @@
+{
+  "languages": [
+    "en",
+    "zh",
+    "ja",
+    "ko",
+    "es",
+    "fr",
+    "de",
+    "pt",
+    "it",
+    "ru",
+    "pl",
+    "none"
+  ],
+  "vocals": [
+    "soft female vocals",
+    "soft male vocals",
+    "female vocals",
+    "male vocals",
+    "rap vocals",
+    "duet vocals",
+    "choir ooh",
+    "no vocals"
+  ],
+  "rhymes": [
+    "AABB",
+    "ABAB",
+    "loose",
+    "free_verse"
+  ],
+  "default_bpm_by_structure": {
+    "pop": 110,
+    "rock": 120,
+    "electronic_edm": 128,
+    "hiphop_rap": 90,
+    "ballad_folk": 72,
+    "trailer_cinematic": 90,
+    "ambient_instrumental": 60,
+    "minimal": 100,
+    "custom": 100
+  },
+  "rhyme_guidance": {
+    "AABB": "prefer AABB end-rhyme within sections",
+    "ABAB": "prefer ABAB end-rhyme within sections",
+    "loose": "loose/occasional rhyme is fine",
+    "free_verse": "free verse is OK; prioritize rhythm and singability over rhyme",
+    "_default": "prefer AABB end-rhyme within sections"
+  },
+  "language_guidance": {
+    "none": "Do not add language markers. Write lyrics in the language of the theme (default English if unclear).",
+    "with_marker": "Place the language marker [{lang}] on its own line at the START of each sung section (verse/chorus/bridge/pre-chorus), never mid-line. Write the lyric text in that language."
+  },
+  "mode_guidance": {
+    "instrumental": "INSTRUMENTAL MODE: lyrics body must contain ONLY section markers (and blank lines). No sung words at all. Tags must include 'no vocals'.",
+    "vocal": "VOCAL MODE: write short sung lines under [verse], [pre-chorus], [chorus], [bridge]. Leave [intro]/[inst]/[build-up]/[drop]/[breakdown]/[outro] empty unless a short outro line is musically useful. Tags must include the vocal type."
+  }
+}

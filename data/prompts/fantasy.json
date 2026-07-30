@@ -1,0 +1,13 @@
+{
+  "0": "Scene must be completely realistic and grounded in the real world. Avoid: magic, mythical creatures, sci-fi, supernatural, anime, cartoon, surreal elements. Use: photorealistic style, everyday real-world settings, natural lighting.",
+  "1": "Scene should be realistic with only subtle artistic touch. Avoid: fantasy creatures, magic, sci-fi tech, unreal environments. Use: cinematic lighting, tasteful color grading, slightly idealized real-world scenes.",
+  "2": "Scene should be mostly realistic with light artistic stylization. Avoid: overt magic, mythical beings, futuristic technology. Use: cinematic composition, high-contrast lighting, slightly enhanced real-world aesthetics.",
+  "3": "Scene can blend realism with subtle fantastical atmosphere. Avoid: explicit fantasy creatures, advanced technology, impossible physics. Use: ethereal lighting, soft glow effects, dreamy color palettes, grounded magical realism.",
+  "4": "Scene can include light fantasy elements. Avoid: high fantasy worlds, aliens, superheroes, reality-warping. Use: a hint of magic, slightly otherworldly settings, mythological undertones in semi-realistic scenes.",
+  "5": "Scene should balance real and fantastical elements equally. Avoid: completely unrealistic worlds, cartoon aesthetics. Use: magical realism, urban fantasy, cyberpunk elements, supernatural beings in real settings.",
+  "6": "Scene should lean clearly into fantasy. Avoid: mundane everyday settings without any fantastical element. Use: magical creatures, enchanted forests, sci-fi cityscapes, superhero aesthetics with grounded anatomy.",
+  "7": "Scene should be strongly fantastical. Avoid: strict realism, ordinary modern settings. Use: high fantasy realms, epic magical battles, alien planets, mythical beasts, dramatic fantasy lighting.",
+  "8": "Scene should be highly fantastical and surreal. Avoid: grounding in reality, normal physics, ordinary architecture. Use: dreamlike dimensions, impossible structures, cosmic entities, abstract symbolism, surreal landscapes.",
+  "9": "Scene should be extremely fantastical and otherworldly. Avoid: anything recognizable as normal reality. Use: cosmic horror, psychedelic dimensions, reality-warping concepts, metaphysical entities, alien geometries.",
+  "10": "Scene should be pure unlimited fantasy with no connection to reality. Avoid: realism, normal physics, ordinary logic, any grounding in the real world. Use: impossible geometries, transcendent godlike entities, realities within realities, the most mind-bending and outlandish concepts imaginable."
+}

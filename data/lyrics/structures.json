@@ -1,0 +1,79 @@
+{
+  "pop": [
+    "[intro]",
+    "[verse]",
+    "[pre-chorus]",
+    "[chorus]",
+    "[verse]",
+    "[pre-chorus]",
+    "[chorus]",
+    "[bridge]",
+    "[chorus]",
+    "[outro]"
+  ],
+  "rock": [
+    "[intro]",
+    "[verse]",
+    "[chorus]",
+    "[verse]",
+    "[chorus]",
+    "[bridge]",
+    "[inst]",
+    "[chorus]",
+    "[outro]"
+  ],
+  "electronic_edm": [
+    "[intro]",
+    "[inst]",
+    "[build-up]",
+    "[drop]",
+    "[breakdown]",
+    "[build-up]",
+    "[drop]",
+    "[outro]"
+  ],
+  "hiphop_rap": [
+    "[intro]",
+    "[verse]",
+    "[chorus]",
+    "[verse]",
+    "[chorus]",
+    "[bridge]",
+    "[verse]",
+    "[chorus]",
+    "[outro]"
+  ],
+  "ballad_folk": [
+    "[intro]",
+    "[verse]",
+    "[pre-chorus]",
+    "[chorus]",
+    "[verse]",
+    "[chorus]",
+    "[inst]",
+    "[chorus]",
+    "[outro]"
+  ],
+  "trailer_cinematic": [
+    "[intro]",
+    "[verse]",
+    "[build-up]",
+    "[inst]",
+    "[chorus]",
+    "[breakdown]",
+    "[inst]",
+    "[outro]"
+  ],
+  "ambient_instrumental": [
+    "[intro]",
+    "[inst]",
+    "[outro]"
+  ],
+  "minimal": [
+    "[verse]",
+    "[chorus]",
+    "[verse]",
+    "[chorus]",
+    "[outro]"
+  ]
+}

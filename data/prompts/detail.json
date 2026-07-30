@@ -1,0 +1,13 @@
+{
+  "0": "Image must be extremely minimal. Avoid: complex backgrounds, multiple subjects, textures, patterns, clutter. Use: single subject, clean empty background, simple shapes, large negative space, few colors.",
+  "1": "Image should be very simple with low detail. Avoid: intricate textures, busy backgrounds, many elements. Use: basic forms, simple lighting, minimal objects, clean composition.",
+  "2": "Image should be simple with modest detail. Avoid: complex textures, multi-layered scenes, atmospheric effects. Use: straightforward composition, few background elements, basic shading.",
+  "3": "Image should have below-average detail. Avoid: busy scenes, intricate patterns, complex lighting. Use: some texturing, modest background, basic light and shadow, uncluttered look.",
+  "4": "Image should have moderate detail. Avoid: hyper-realistic textures, volumetric effects, micro-details. Use: decent textures, a few background elements, basic lighting depth, balanced composition.",
+  "5": "Image should have standard good-quality detail. Avoid: flat or overly simplistic rendering, cluttered chaos. Use: good textures, appropriate background, proper lighting and shadows, well-balanced composition.",
+  "6": "Image should have above-average detail and richness. Avoid: blurry or low-resolution look, empty flat areas. Use: rich textures, detailed background, nuanced lighting with highlights, many visual elements.",
+  "7": "Image should be highly detailed. Avoid: simple surfaces, basic lighting, sparse composition. Use: intricate textures, complex multi-element background, layered lighting, atmospheric haze or particles.",
+  "8": "Image should be very highly detailed. Avoid: any area that looks simple or underdone. Use: extremely detailed textures on all surfaces, volumetric lighting, particle effects, complex multi-layered scene.",
+  "9": "Image should be exceptionally detailed at a professional level. Avoid: leaving anything to the imagination — every surface must be defined. Use: hyper-realistic textures, ray-traced quality lighting, micro-details on all surfaces, deep background layers, volumetrics, subsurface scattering on skin, fabric weave visible, pores visible.",
+  "10": "Image must be maximally detailed — indistinguishable from a real 8K photograph. Avoid: any simplification, blur, flat surfaces, missing detail. Use: photorealism at its absolute peak — every pore, every hair strand, every fabric thread, every dust particle, every reflection and refraction, every skin imperfection, ultra-HD 8K+ quality. Nothing is left undescribed or generic."
+}

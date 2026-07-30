@@ -1,0 +1,122 @@
+{
+  "clean_up": {
+    "label": "Clean up (fix only)",
+    "instruction": "Mode: Clean up only.\n- Fix spelling, grammar, punctuation, and capitalization.\n- Restructure sentences/paragraphs so the text is clear and well-written.\n- Keep meaning, intent, tone, and formality unchanged.\n- Do NOT add new information, ideas, examples, explanations, titles, or conclusions.\n- Do NOT remove meaning (only drop pure noise like repeated typos once sense is clear).",
+    "suggested_temperature": 0.2
+  },
+  "custom": {
+    "label": "Custom instruction",
+    "instruction": "Mode: Custom.\nFollow the user's custom instruction carefully when rewriting the text.\nIf the instruction is empty, fall back to clean-up only (grammar/spelling/clarity,\nno new content).",
+    "suggested_temperature": 0.55
+  },
+  "formalize": {
+    "label": "Formalize",
+    "instruction": "Mode: Formalize.\nRewrite in polished, formal language suitable for professional or academic contexts.\nUse complete sentences, proper grammar, and avoid slang or contractions when possible.\nKeep the same meaning; do not pad with empty formalities.",
+    "suggested_temperature": 0.2
+  },
+  "easier_to_read": {
+    "label": "Easier to read",
+    "instruction": "Mode: Easier to read.\nSimplify wording and sentence structure for maximum clarity.\nPrefer short sentences, common words, and clear paragraph breaks.\nKeep all important meaning; do not dumb down into inaccuracy.",
+    "suggested_temperature": 0.2
+  },
+  "humanize": {
+    "label": "Humanize",
+    "instruction": "Mode: Humanize.\nMake the text sound natural and human-written — warm, varied rhythm, light\npersonality — without becoming slangy or chaotic.\nRemove stiff AI-sounding phrasing, redundant hedges, and robotic lists when prose fits better.\nKeep the same facts and intent.",
+    "suggested_temperature": 0.55
+  },
+  "professionalize": {
+    "label": "Professional-ize",
+    "instruction": "Mode: Professional-ize.\nRewrite for a workplace / business audience: confident, clear, and concise.\nAvoid slang, hostility, and excessive casual tone.\nKeep the same requests, facts, and decisions.",
+    "suggested_temperature": 0.2
+  },
+  "less_snark": {
+    "label": "Less snark",
+    "instruction": "Mode: Less snark.\nRemove sarcasm, eye-rolling, and cutting asides. Keep a direct but respectful tone.\nDo not change the underlying message.",
+    "suggested_temperature": 0.4
+  },
+  "less_patronizing": {
+    "label": "Less patronizing",
+    "instruction": "Mode: Less patronizing.\nRemove condescension, talking-down, and over-explaining that treats the reader as\nincapable. Stay helpful and equal in tone.",
+    "suggested_temperature": 0.4
+  },
+  "less_hostile": {
+    "label": "Less hostile",
+    "instruction": "Mode: Less hostile.\nSoften aggression, insults, and combative wording while preserving the speaker's\nactual position and requests.",
+    "suggested_temperature": 0.4
+  },
+  "shorter": {
+    "label": "Shorter",
+    "instruction": "Mode: Shorter.\nCompress the text: cut filler, repetition, and weak modifiers.\nKeep every essential point. Aim for roughly 50–70% of the original length when possible.",
+    "suggested_temperature": 0.2
+  },
+  "longer": {
+    "label": "Longer",
+    "instruction": "Mode: Longer.\nExpand for flow and clarity: fuller sentences, light connective tissue, and clearer\nstructure. Do not invent new claims or plot points — only elaborate what is already there.\nAim for roughly 1.3–1.6× the original length.",
+    "suggested_temperature": 0.55
+  },
+  "way_longer": {
+    "label": "Way longer",
+    "instruction": "Mode: Way longer.\nSubstantially expand the text with richer explanation of ideas already present:\nexamples only when implied by the source, smoother transitions, and more complete\nprose. Do not add unrelated topics. Aim for roughly 2–3× the original length.",
+    "suggested_temperature": 0.55
+  },
+  "smarter": {
+    "label": "Smarter",
+    "instruction": "Mode: Smarter.\nRaise precision and intellectual clarity: sharper word choice, tighter logic, and\nmore sophisticated phrasing — without becoming pretentious or inventing expertise\nthe source does not support.",
+    "suggested_temperature": 0.4
+  },
+  "relaxed": {
+    "label": "Relaxed",
+    "instruction": "Mode: Relaxed.\nSofter, calmer, more laid-back voice. Easy cadence, less urgency, still coherent.",
+    "suggested_temperature": 0.4
+  },
+  "casual": {
+    "label": "Casual",
+    "instruction": "Mode: Casual.\nEveryday conversational tone: natural contractions, informal but readable prose.\nNot crude, not essay-formal.",
+    "suggested_temperature": 0.4
+  },
+  "highschooler_casual": {
+    "label": "Highschooler (casual)",
+    "instruction": "Mode: Highschooler (casual).\nSound like a typical high-school student texting/talking: simple vocab, informal\nrhythm, occasional youthful phrasing. Still grammatical enough to read cleanly.",
+    "suggested_temperature": 0.55
+  },
+  "highschooler_essay": {
+    "label": "Highschooler essay",
+    "instruction": "Mode: Highschooler essay.\nRewrite as a solid high-school essay voice: basic thesis-style clarity, simple\ntransitions, school-appropriate formality — not graduate-level jargon.",
+    "suggested_temperature": 0.4
+  },
+  "undergrad_casual": {
+    "label": "Undergrad (casual)",
+    "instruction": "Mode: Undergrad (casual).\nCollege-student casual: reasonably articulate, lightly informal, aware but not\ncorporate. Natural campus-adult voice.",
+    "suggested_temperature": 0.55
+  },
+  "undergrad_essay": {
+    "label": "Undergrad essay",
+    "instruction": "Mode: Undergrad essay.\nUndergraduate academic prose: clearer structure, more precise vocabulary, mild\nanalytical tone. Not overly stiff or journal-level.",
+    "suggested_temperature": 0.4
+  },
+  "tipsy": {
+    "label": "Tipsy",
+    "instruction": "Mode: Tipsy.\nSlightly looser, warmer, a bit rambling and cheerful — as if one drink in.\nStill mostly coherent; do not garble meaning.",
+    "suggested_temperature": 0.85
+  },
+  "drunk": {
+    "label": "Drunk",
+    "instruction": "Mode: Drunk.\nMessier rhythm, emotional digressions, imperfect focus — but keep the original\npoints recognizable. Fun caricature, not pure gibberish.",
+    "suggested_temperature": 0.85
+  },
+  "pirate": {
+    "label": "Pirate",
+    "instruction": "Mode: Pirate.\nRewrite in classic pirate speak (arr, ye, matey, etc.) while keeping the same\nmeaning. Stay playful, not unreadable.",
+    "suggested_temperature": 0.85
+  },
+  "uwu": {
+    "label": "UwU",
+    "instruction": "Mode: UwU.\nCute, soft internet \"uwu\" voice (gentle wording, playful elongations where natural).\nDo not destroy readability entirely; keep the meaning intact.",
+    "suggested_temperature": 0.85
+  },
+  "gigabrain": {
+    "label": "Gigabrain",
+    "instruction": "Mode: Gigabrain.\nHyper-intellectual, slightly over-the-top smart-person voice: dense vocabulary,\nlayered phrasing, analytical flair. Still map to the original meaning; avoid\nmeaningless buzzword soup.",
+    "suggested_temperature": 0.85
+  }
+}

@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-wizdroid-tools"
-version = "2026.07.01"
-description = "Clean, powerful utility nodes for ComfyUI — LLM prompt generation and more."
+version = "2026.07.30"
+description = "Clean, powerful utility nodes for ComfyUI — LLM image prompts, ACE-Step lyrics, text rewrite, and more."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
