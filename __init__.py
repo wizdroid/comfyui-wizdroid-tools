@@ -3,6 +3,8 @@
 Includes:
 - LLM Prompt Generator: Generate image prompts via Ollama with fine-grained
   control over spice, fantasy, and detail levels.
+- Character Prompt Generator: Build a character via dropdowns, then generate
+  an image prompt via Ollama or a plain template.
 - LLM Lyrics Generator: ACE-Step 1.5 structured lyrics + tags via Ollama.
 - LLM Text Rewriter: Mode-based rewrite (clean-up, formalize, humanize, pirate,
   custom instruction, …) via Ollama.
@@ -67,6 +69,10 @@ _rewrite_nodes = _import_node_module("llm_text_rewriter")
 REWRITE_NODE_CLASS_MAPPINGS = _rewrite_nodes.NODE_CLASS_MAPPINGS
 REWRITE_DISPLAY_NAME_MAPPINGS = _rewrite_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
+_character_nodes = _import_node_module("llm_character_prompt")
+CHARACTER_NODE_CLASS_MAPPINGS = _character_nodes.NODE_CLASS_MAPPINGS
+CHARACTER_DISPLAY_NAME_MAPPINGS = _character_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
 # ---------------------------------------------------------------------------
 # Combined mappings for ComfyUI
 # ---------------------------------------------------------------------------
@@ -75,10 +81,12 @@ NODE_CLASS_MAPPINGS = {
     **LLM_NODE_CLASS_MAPPINGS,
     **LYRICS_NODE_CLASS_MAPPINGS,
     **REWRITE_NODE_CLASS_MAPPINGS,
+    **CHARACTER_NODE_CLASS_MAPPINGS,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     **LLM_DISPLAY_NAME_MAPPINGS,
     **LYRICS_DISPLAY_NAME_MAPPINGS,
     **REWRITE_DISPLAY_NAME_MAPPINGS,
+    **CHARACTER_DISPLAY_NAME_MAPPINGS,
 }

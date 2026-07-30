@@ -8,11 +8,14 @@ so dropdowns re-read choices. Generation always uses the latest file contents.
 
 ```
 data/
-├── prompts/                 # LLM Prompt Generator (image)
+├── prompts/                 # LLM Prompt Generator (image) + Character AI guidance
 │   ├── spice.json           # levels 0–10
 │   ├── fantasy.json
 │   ├── detail.json
 │   └── system.json          # system_prompt_template, user_prompt_wrapper
+├── character/               # Character Prompt Generator
+│   ├── choices.json         # dropdown concrete values per attribute
+│   └── system.json          # system/user templates ({character_json}, guidance)
 ├── rewrite/                 # LLM Text Rewriter
 │   ├── modes.json           # mode_id → label, instruction, suggested_temperature
 │   └── system.json          # base system, output rules, mode_order, templates
