@@ -29,7 +29,7 @@ _AI_FALLBACK_SUFFIX = " # [AI unavailable — template fallback]"
 def _dropdown(field: str, tooltip: str = "") -> tuple:
     """Build a ComfyUI dropdown widget for a character field."""
     choices = get_dropdown_choices(field)
-    default = "random" if "random" in choices else (choices[0] if choices else "none")
+    default = "none"
     opts: Dict[str, Any] = {"default": default}
     if tooltip:
         opts["tooltip"] = tooltip
@@ -152,6 +152,20 @@ class WizdroidCharacterPrompt:
                         ),
                     },
                 ),
+                # --- LoRA trigger ---
+                "lora_trigger": (
+                    "STRING",
+                    {
+                        "default": "",
+                        "multiline": False,
+                        "tooltip": (
+                            "LoRA trigger word(s) to prepend to the prompt. For the Qwen "
+                            "Multiple-Angles LoRA, use '<sks>' (the camera dropdowns will "
+                            "then produce the expected '[azimuth] [elevation] [distance]' "
+                            "format in the prompt)."
+                        ),
+                    },
+                ),
                 # --- Demographics ---
                 "gender": _dropdown("gender"),
                 "age_group": _dropdown("age_group"),
@@ -189,19 +203,6 @@ class WizdroidCharacterPrompt:
                         "default": "",
                         "multiline": False,
                         "tooltip": "Additional upper-body jewellery/accessories.",
-                    },
-                ),
-                "lora_trigger": (
-                    "STRING",
-                    {
-                        "default": "",
-                        "multiline": False,
-                        "tooltip": (
-                            "LoRA trigger word(s) to prepend to the prompt. For the Qwen "
-                            "Multiple-Angles LoRA, use '<sks>' (the camera dropdowns will "
-                            "then produce the expected '[azimuth] [elevation] [distance]' "
-                            "format in the prompt)."
-                        ),
                     },
                 ),
                 # --- Camera ---
@@ -427,5 +428,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WizdroidCharacterPrompt": "🧙 Character Prompt Generator",
+    "WizdroidCharacterPrompt": "🧙 LLM Character Prompt Generator",
 }

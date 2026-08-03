@@ -20,8 +20,8 @@ from lib.prompts import get_detail_prompts, get_fantasy_prompts, get_spice_promp
 
 logger = logging.getLogger(__name__)
 
-# Special dropdown tokens (appended at INPUT_TYPES time; not stored in JSON)
-SPECIAL_OPTIONS: tuple[str, ...] = ("random", "none", "increment")
+# Special dropdown tokens (prepended at INPUT_TYPES time; not stored in JSON)
+SPECIAL_OPTIONS: tuple[str, ...] = ("none", "random", "increment")
 _SPECIAL_SET = frozenset(SPECIAL_OPTIONS)
 
 # Stable field index order for seed offsets (dropdowns only)
@@ -150,9 +150,9 @@ def get_concrete_choices(field: str) -> List[str]:
 
 
 def get_dropdown_choices(field: str) -> List[str]:
-    """Dropdown list: concrete values + random, none, increment."""
+    """Dropdown list: none, random, increment + concrete values."""
     concrete = get_concrete_choices(field)
-    return concrete + list(SPECIAL_OPTIONS)
+    return list(SPECIAL_OPTIONS) + concrete
 
 
 def get_all_dropdown_choices() -> Dict[str, List[str]]:

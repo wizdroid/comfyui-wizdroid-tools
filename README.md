@@ -212,9 +212,60 @@ Data: `data/rewrite/modes.json`, `system.json`.
 
 ---
 
+### 5. Presets (plugin-style)
+
+Category: `🧙 Wizdroid/Presets`
+
+Simple non-AI nodes: one **dropdown** of catalog items + one **details**
+text field (color, material, placement, …). Output is a single prompt
+fragment string.
+
+Nodes are **generated from JSON**. Each file under `data/presets/*.json`
+becomes one node. Drop in a new file, restart ComfyUI — no Python edits.
+That is the plugin behaviour.
+
+Shipped catalogs (filenames → nodes):
+
+| File | Node |
+|------|------|
+| `footwear.json` | 🧙 Footwear |
+| `headgear.json` | 🧙 Headgear |
+| `hairstyle_extras.json` | 🧙 Hairstyle Extras |
+| `makeup.json` | 🧙 Makeup |
+| `eyewear.json` | 🧙 Eyewear |
+| `jewelry.json` | 🧙 Jewelry |
+| `piercings.json` | 🧙 Piercings |
+| `tattoos.json` | 🧙 Tattoos |
+| `body_markings.json` | 🧙 Body Markings |
+| `gloves.json` | 🧙 Gloves |
+| `nails.json` | 🧙 Nails |
+| `neckwear.json` | 🧙 Neckwear |
+| `tops.json` | 🧙 Tops |
+| `bottoms.json` | 🧙 Bottoms |
+| `outerwear.json` | 🧙 Outerwear |
+| `hosiery.json` | 🧙 Hosiery |
+| `bags.json` | 🧙 Bags |
+| `accessories.json` | 🧙 Accessories |
+| `props.json` | 🧙 Props |
+| `weapons.json` | 🧙 Weapons |
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `item` | dropdown | Catalog entry; `none` skips the type |
+| `details` | STRING | Free-text extras (color, material, …) |
+
+| Output | Type | Meaning |
+|--------|------|---------|
+| `text` | STRING | Fragment, e.g. `combat boots, matte black leather` |
+
+See `data/presets/README.md` for schema and how to ship your own catalog.
+
+---
+
 ## Data directory
 
-Nothing important is hard-coded. Edit JSON, save, refresh the ComfyUI page.
+Nothing important is hard-coded. Edit JSON, save, refresh the ComfyUI page
+(for existing dropdowns). **New** preset files need a ComfyUI restart.
 
 ```
 data/
@@ -222,6 +273,7 @@ data/
   character/    # character dropdowns + templates
   lyrics/       # ACE-Step structures, choices, templates
   rewrite/      # text rewriter modes + templates
+  presets/      # plugin-style preset catalogs (one JSON → one node)
 ```
 
 JSON is reloaded when mtime changes. Invalid JSON falls back to small
@@ -249,11 +301,14 @@ comfyui-wizdroid-tools/
     character_prompts.py      # character resolve + template
     lyrics_prompts.py
     rewrite_prompts.py
+    presets.py                # discover + format preset catalogs
   nodes/
     llm_prompt_generator.py
     llm_character_prompt.py
     llm_lyrics_generator.py
     llm_text_rewriter.py
+    llm_qwen_multi_angles.py
+    preset_nodes.py           # dynamic nodes from data/presets/
 ```
 
 ## License

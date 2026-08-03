@@ -11,6 +11,9 @@ Includes:
 - Qwen Multi-Angles LoRA Prompt: Non-AI utility that builds the proper
   ``<sks>`` prompt string for the fal/Qwen-Image-Edit-2511-Multiple-Angles-LoRA
   (96 camera poses).
+- Presets: data-driven dropdown + details nodes (footwear, headgear, makeup,
+  …). Drop a new JSON under ``data/presets/`` and restart ComfyUI to get a
+  new node — plugin-style catalogs, no Python edits.
 """
 
 __version__ = "2026.07.30"
@@ -80,6 +83,11 @@ _qwen_multi_angles = _import_node_module("llm_qwen_multi_angles")
 QWEN_MULTI_ANGLES_CLASS_MAPPINGS = _qwen_multi_angles.NODE_CLASS_MAPPINGS
 QWEN_MULTI_ANGLES_DISPLAY_NAME_MAPPINGS = _qwen_multi_angles.NODE_DISPLAY_NAME_MAPPINGS
 
+# Preset nodes are data-driven: one node class per data/presets/*.json file.
+_preset_nodes = _import_node_module("preset_nodes")
+PRESET_NODE_CLASS_MAPPINGS = _preset_nodes.NODE_CLASS_MAPPINGS
+PRESET_NODE_DISPLAY_NAME_MAPPINGS = _preset_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
 # ---------------------------------------------------------------------------
 # Combined mappings for ComfyUI
 # ---------------------------------------------------------------------------
@@ -90,6 +98,7 @@ NODE_CLASS_MAPPINGS = {
     **REWRITE_NODE_CLASS_MAPPINGS,
     **CHARACTER_NODE_CLASS_MAPPINGS,
     **QWEN_MULTI_ANGLES_CLASS_MAPPINGS,
+    **PRESET_NODE_CLASS_MAPPINGS,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -98,4 +107,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **REWRITE_DISPLAY_NAME_MAPPINGS,
     **CHARACTER_DISPLAY_NAME_MAPPINGS,
     **QWEN_MULTI_ANGLES_DISPLAY_NAME_MAPPINGS,
+    **PRESET_NODE_DISPLAY_NAME_MAPPINGS,
 }
