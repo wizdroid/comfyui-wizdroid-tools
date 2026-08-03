@@ -8,6 +8,9 @@ Includes:
 - LLM Lyrics Generator: ACE-Step 1.5 structured lyrics + tags via Ollama.
 - LLM Text Rewriter: Mode-based rewrite (clean-up, formalize, humanize, pirate,
   custom instruction, …) via Ollama.
+- Qwen Multi-Angles LoRA Prompt: Non-AI utility that builds the proper
+  ``<sks>`` prompt string for the fal/Qwen-Image-Edit-2511-Multiple-Angles-LoRA
+  (96 camera poses).
 """
 
 __version__ = "2026.07.30"
@@ -73,6 +76,10 @@ _character_nodes = _import_node_module("llm_character_prompt")
 CHARACTER_NODE_CLASS_MAPPINGS = _character_nodes.NODE_CLASS_MAPPINGS
 CHARACTER_DISPLAY_NAME_MAPPINGS = _character_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
+_qwen_multi_angles = _import_node_module("llm_qwen_multi_angles")
+QWEN_MULTI_ANGLES_CLASS_MAPPINGS = _qwen_multi_angles.NODE_CLASS_MAPPINGS
+QWEN_MULTI_ANGLES_DISPLAY_NAME_MAPPINGS = _qwen_multi_angles.NODE_DISPLAY_NAME_MAPPINGS
+
 # ---------------------------------------------------------------------------
 # Combined mappings for ComfyUI
 # ---------------------------------------------------------------------------
@@ -82,6 +89,7 @@ NODE_CLASS_MAPPINGS = {
     **LYRICS_NODE_CLASS_MAPPINGS,
     **REWRITE_NODE_CLASS_MAPPINGS,
     **CHARACTER_NODE_CLASS_MAPPINGS,
+    **QWEN_MULTI_ANGLES_CLASS_MAPPINGS,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -89,4 +97,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **LYRICS_DISPLAY_NAME_MAPPINGS,
     **REWRITE_DISPLAY_NAME_MAPPINGS,
     **CHARACTER_DISPLAY_NAME_MAPPINGS,
+    **QWEN_MULTI_ANGLES_DISPLAY_NAME_MAPPINGS,
 }
