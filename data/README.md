@@ -16,6 +16,9 @@ data/
 ├── character/               # Character Prompt Generator
 │   ├── choices.json         # dropdown concrete values per attribute
 │   └── system.json          # system/user templates ({character_json}, guidance)
+├── scene/                   # Video scene generators (text + VL)
+│   ├── choices.json         # mood, style dropdowns
+│   └── system.json          # text/vl system + user templates
 ├── rewrite/                 # LLM Text Rewriter
 │   ├── modes.json           # mode_id → label, instruction, suggested_temperature
 │   └── system.json          # base system, output rules, mode_order, templates

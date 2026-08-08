@@ -57,6 +57,7 @@ EXTRA_TEXT_FIELDS: tuple[str, ...] = (
     "extra_face",
     "extra_hair",
     "extra_jewellery",
+    "extra_accessories",
     "lora_trigger",
     "extra_outfit",
     "extra_background",
@@ -76,7 +77,20 @@ _FALLBACK_CHOICES: Dict[str, List[str]] = {
     "eye_color": ["brown", "blue", "green", "hazel", "gray", "amber"],
     "face_shape": ["round", "oval", "square", "heart-shaped", "diamond-shaped"],
     "facial_hair": ["clean-shaven", "mustache", "beard", "goatee", "stubble"],
-    "expression": ["happy", "sad", "angry", "surprised", "neutral", "thoughtful"],
+    "expression": [
+        "neutral",
+        "happy",
+        "sad",
+        "angry",
+        "surprised",
+        "thoughtful",
+        "smirking",
+        "laughing",
+        "serious",
+        "soft smile",
+        "seductive",
+        "fierce",
+    ],
     "camera_azimuth": ["front view", "right side view", "back view", "left side view"],
     "camera_elevation": ["low-angle shot", "eye-level shot", "elevated shot", "high-angle shot"],
     "camera_distance": ["close-up", "medium shot", "wide shot"],
@@ -102,17 +116,20 @@ _FALLBACK_CHOICES: Dict[str, List[str]] = {
 
 _FALLBACK_SYSTEM: Dict[str, str] = {
     "system_prompt_template": (
-        "You are a prompt writer for AI image generators. Given a JSON description "
-        "of a character, write a single-paragraph image prompt. Include all specified "
-        "attributes. Do NOT add attributes not in the JSON. Output only the prompt "
-        "text — no markdown, no explanations. Max {max_tokens} words.\n\n"
+        "You are an expert prompt engineer for AI image generators. Given a JSON "
+        "description of a character, write a single-paragraph image prompt. Include "
+        "every specified attribute. Where the JSON is silent, expand with rich visual "
+        "detail (expression micro-detail, skin, hair, hands, fabric, lighting, "
+        "environment, camera, media finish) without contradicting the JSON. Output only "
+        "the prompt text — no markdown, no explanations. Max {max_tokens} words.\n\n"
         "## CONTENT RULES\n"
         "{spice_guidance}\n\n{fantasy_guidance}\n\n{detail_guidance}\n\n"
         "Character JSON:\n{character_json}"
     ),
     "user_prompt_template": (
-        "Generate a detailed image prompt for this character description in JSON. "
-        "Output just the prompt text:\n{character_json}"
+        "Write a single-paragraph image prompt for this character JSON. Include all "
+        "fields; expand missing visual detail without contradictions. Output only the "
+        "prompt text:\n{character_json}"
     ),
 }
 
@@ -362,10 +379,14 @@ def build_template_prompt(resolved: Dict[str, Any]) -> str:
         custom_input = custom_input[:_CUSTOM_INPUT_MAX_TEMPLATE] + "…"
 
     lora_trigger = _get("lora_trigger")
-    # jewellery is only in AI JSON / free text; append if present in template mode
+    # jewellery / accessories are free text; append if present in template mode
     extra_jewellery = _get("extra_jewellery")
     if extra_jewellery:
         parts.append(extra_jewellery)
+
+    extra_accessories = _get("extra_accessories")
+    if extra_accessories:
+        parts.append(extra_accessories)
 
     if not parts and not custom_input:
         text = "A character."

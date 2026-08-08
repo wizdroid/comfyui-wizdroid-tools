@@ -74,6 +74,7 @@ Refresh the browser page; the new option appears in the Footwear node dropdown.
 | `footwear.json` | Footwear |
 | `headgear.json` | Headgear |
 | `hairstyle_extras.json` | Hairstyle Extras |
+| `expressions.json` | Expressions |
 | `makeup.json` | Makeup |
 | `eyewear.json` | Eyewear |
 | `jewelry.json` | Jewelry |

@@ -101,7 +101,7 @@ Global inputs:
 | `use_ai` | BOOLEAN | AI vs template (default True) |
 | `seed` | INT 0..0xFFFFFFFF | Drives random/increment |
 | `temperature` | FLOAT 0-2 | AI mode only |
-| `max_tokens` | INT 64-1024 | AI mode only |
+| `max_tokens` | INT 64-2048 | AI mode only (default 512 for rich expansion) |
 | `spice` / `fantasy` / `detail` | INT 0-10 | AI mode only |
 
 Character fields (dropdown unless noted):
@@ -110,7 +110,7 @@ Character fields (dropdown unless noted):
 |-------|--------|
 | Demographics | `gender`, `age_group`, `body_type`, `body_shape`, `height`, `skin_tone` |
 | Head / face | `hair_color`, `hair_style`, `eye_color`, `face_shape`, `facial_hair`, `expression` |
-| Free text | `extra_face`, `extra_hair`, `extra_jewellery`, `lora_trigger` (STRING) |
+| Free text | `extra_face`, `extra_hair`, `extra_jewellery`, `extra_accessories`, `lora_trigger` (STRING) |
 | Camera | `camera_azimuth`, `camera_elevation`, `camera_distance` |
 | Pose | `pose_position`, `pose_orientation`, `pose_style` |
 | Outfit | `outfit_style`, `extra_outfit` (STRING) |
@@ -135,7 +135,62 @@ Data:
 
 ---
 
-### 3. LLM Lyrics Generator
+### 3. LLM Video Scene Generator
+
+Class: `WizdroidLLMSceneGenerator`
+
+Text-only scene package for AI **video** workflows (and a keyframe image prompt).
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `ollama_url` / `ollama_model` | STRING / dropdown | Text LLM (vision not required) |
+| `user_prompt` | STRING multiline | Scene idea |
+| `duration_seconds` | FLOAT 0.5–120 | Target clip length |
+| `mood` | dropdown | From `data/scene/choices.json` |
+| `style` | dropdown | cinematic, candid, anime, … |
+| `temperature` / `max_tokens` | FLOAT / INT | Sampling |
+| `extra_instructions` | STRING optional | Extra constraints |
+| `seed` | INT optional | 0 = random |
+
+Outputs:
+
+| Name | Meaning |
+|------|---------|
+| `scene_prompt` | Motion / camera / action for video models |
+| `dialogue` | Spoken lines (empty if silent) |
+| `image_prompt` | Still keyframe prompt (T2I → I2V) |
+| `raw` | Full model response |
+
+Data: `data/scene/choices.json`, `system.json`.
+
+---
+
+### 4. VL Video Scene Generator
+
+Class: `WizdroidVLSceneGenerator`
+
+Vision-language scene package: **source image + user direction** → timed scene,
+dialogue, and a refined keyframe prompt. Use a VL Ollama model
+(`llava`, `qwen2.5-vl`, `gemma3`, `minicpm-v`, …).
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `image` | IMAGE | Source frame (ComfyUI IMAGE tensor) |
+| `ollama_url` / `ollama_model` | STRING / dropdown | **Vision** model required |
+| `user_prompt` | STRING multiline | Direction (empty = subtle natural motion) |
+| `duration_seconds` | FLOAT 0.5–120 | Target clip length |
+| `mood` / `style` | dropdown | Same catalogs as text scene node |
+| `temperature` / `max_tokens` | FLOAT / INT | Sampling |
+| `extra_instructions` | STRING optional | Extra constraints |
+| `seed` | INT optional | 0 = random |
+| `max_image_side` | INT optional | Downscale longest side before VL (default 1280) |
+
+Outputs: same as LLM Video Scene Generator (`scene_prompt`, `dialogue`,
+`image_prompt`, `raw`).
+
+---
+
+### 5. LLM Lyrics Generator
 
 Class: `WizdroidLLMLyricsGenerator`
 
@@ -173,7 +228,7 @@ Data: `data/lyrics/structures.json`, `choices.json`, `system.json`.
 
 ---
 
-### 4. LLM Text Rewriter
+### 6. LLM Text Rewriter
 
 Class: `WizdroidLLMTextRewriter`
 
@@ -212,7 +267,7 @@ Data: `data/rewrite/modes.json`, `system.json`.
 
 ---
 
-### 5. Presets (plugin-style)
+### 7. Presets (plugin-style)
 
 Category: `🧙 Wizdroid/Presets`
 
@@ -231,6 +286,7 @@ Shipped catalogs (filenames → nodes):
 | `footwear.json` | 🧙 Footwear |
 | `headgear.json` | 🧙 Headgear |
 | `hairstyle_extras.json` | 🧙 Hairstyle Extras |
+| `expressions.json` | 🧙 Expressions |
 | `makeup.json` | 🧙 Makeup |
 | `eyewear.json` | 🧙 Eyewear |
 | `jewelry.json` | 🧙 Jewelry |
@@ -271,6 +327,7 @@ Nothing important is hard-coded. Edit JSON, save, refresh the ComfyUI page
 data/
   prompts/      # image prompt generator + character AI guidance
   character/    # character dropdowns + templates
+  scene/        # video scene mood/style + VL/text templates
   lyrics/       # ACE-Step structures, choices, templates
   rewrite/      # text rewriter modes + templates
   presets/      # plugin-style preset catalogs (one JSON → one node)
@@ -305,6 +362,8 @@ comfyui-wizdroid-tools/
   nodes/
     llm_prompt_generator.py
     llm_character_prompt.py
+    llm_scene_generator.py    # text → video scene package
+    llm_vl_scene_generator.py # image + text → video scene package
     llm_lyrics_generator.py
     llm_text_rewriter.py
     llm_qwen_multi_angles.py

@@ -1,13 +1,17 @@
 """Ollama client for comfyui-wizdroid-tools.
 
-Handles model discovery, text generation, and thinking-model support.
+Handles model discovery, text generation, vision (image) generation, and
+thinking-model support.
 """
 
 from __future__ import annotations
 
+import base64
+import io
 import json
+import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 try:
     import requests  # type: ignore[import-not-found]
@@ -15,6 +19,8 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from .constants import DEFAULT_OLLAMA_URL, THINKING_MODEL_PREFIXES
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Model cache with TTL to prevent UI blocking on repeated INPUT_TYPES calls
@@ -87,6 +93,38 @@ def _safe_post(url: str, json_body: Dict[str, Any], timeout: int = 120) -> Tuple
     return True, resp.text
 
 
+def _build_generate_options(
+    *,
+    temperature: float,
+    max_tokens: int,
+    seed: int,
+    model: str,
+) -> Dict[str, Any]:
+    opts: Dict[str, Any] = {
+        "temperature": temperature,
+        "num_predict": max_tokens,
+    }
+    if seed != 0:
+        opts["seed"] = seed
+        opts["random_seed"] = seed
+    if _is_thinking_model(model):
+        opts["think"] = 0
+    return opts
+
+
+def _extract_generate_text(data: Dict[str, Any], raw_text: str) -> str:
+    """Pull response text from an Ollama generate/chat-shaped payload."""
+    msg = data.get("message")
+    if isinstance(msg, dict):
+        out = (msg.get("content") or "").strip()
+        if out:
+            return out
+    out = (data.get("response") or "").strip()
+    if out:
+        return out
+    return (raw_text or "").strip()
+
+
 def generate_text(
     *,
     ollama_url: str,
@@ -97,6 +135,7 @@ def generate_text(
     max_tokens: int = 512,
     seed: int = 0,
     timeout: int = 120,
+    images: Optional[Sequence[str]] = None,
 ) -> Tuple[bool, str]:
     """Call Ollama /api/generate and return (ok, response_or_error).
 
@@ -105,21 +144,17 @@ def generate_text(
       actual response.
     - Falling back to message.content when the response field is empty.
     - Retrying with a higher token budget when done_reason == "length".
+
+    Args:
+        images: Optional list of base64-encoded images (no data-URI prefix)
+            for vision-language models (llava, qwen2.5-vl, gemma3, etc.).
     """
-    opts: Dict[str, Any] = {
-        "temperature": temperature,
-        "num_predict": max_tokens,
-    }
-
-    if seed != 0:
-        opts["seed"] = seed
-        # Also set a fixed seed to ensure reproducibility
-        # Some models use 'seed', others use 'random_seed'
-        opts["random_seed"] = seed
-
-    # Disable thinking for thinking-capable models to reserve tokens for response
-    if _is_thinking_model(model):
-        opts["think"] = 0
+    opts = _build_generate_options(
+        temperature=temperature,
+        max_tokens=max_tokens,
+        seed=seed,
+        model=model,
+    )
 
     payload: Dict[str, Any] = {
         "model": model,
@@ -128,6 +163,9 @@ def generate_text(
         "system": system,
         "options": opts,
     }
+    if images:
+        # Ollama expects raw base64 strings (no data:image/... prefix)
+        payload["images"] = [img for img in images if img]
 
     api_url = f"{ollama_url.rstrip('/')}/api/generate"
 
@@ -154,15 +192,7 @@ def generate_text(
             return True, out
         return False, "empty_response"
 
-    # Some models embed /api/chat style message inside /api/generate response
-    msg = data.get("message")
-    if isinstance(msg, dict):
-        out = (msg.get("content") or "").strip()
-        if out:
-            return True, out
-
-    out = (data.get("response") or "").strip()
-
+    out = _extract_generate_text(data, raw_text)
     if out:
         return True, out
 
@@ -170,12 +200,123 @@ def generate_text(
     done_reason = (data.get("done_reason") or "").lower()
     if done_reason == "length" and opts.get("num_predict", 512) < 4096:
         opts["num_predict"] = min(opts.get("num_predict", 512) * 2, 4096)
-        # Also force disable thinking on retry
         opts["think"] = 0
         ok2, raw2, data2 = _do_request(opts)
         if ok2 and isinstance(data2, dict):
-            out2 = (data2.get("response") or "").strip()
+            out2 = _extract_generate_text(data2, raw2)
             if out2:
                 return True, out2
 
     return False, "empty_response"
+
+
+def comfy_image_to_base64_png(
+    image: Any,
+    *,
+    max_side: int = 1280,
+) -> Tuple[bool, str]:
+    """Convert a ComfyUI IMAGE tensor (or batch) to a base64 PNG string.
+
+    Expects shape ``[B, H, W, C]`` or ``[H, W, C]`` with values in ``[0, 1]``.
+    Uses the first batch item when a batch is provided.
+
+    Returns:
+        ``(True, base64_png)`` or ``(False, error_message)``.
+    """
+    try:
+        import numpy as np
+    except ImportError:  # pragma: no cover
+        return False, "numpy is required for vision image encoding"
+
+    try:
+        from PIL import Image
+    except ImportError:  # pragma: no cover
+        return False, "Pillow (PIL) is required for vision image encoding"
+
+    try:
+        # Torch tensor path (standard ComfyUI IMAGE)
+        if hasattr(image, "detach"):
+            t = image.detach().cpu()
+            if hasattr(t, "numpy"):
+                arr = t.numpy()
+            else:
+                arr = np.array(t)
+        elif isinstance(image, np.ndarray):
+            arr = image
+        else:
+            arr = np.array(image)
+
+        arr = np.asarray(arr)
+        if arr.ndim == 4:
+            arr = arr[0]
+        if arr.ndim != 3:
+            return False, f"unsupported image shape: {getattr(arr, 'shape', None)}"
+
+        # Channel-first [C,H,W] → [H,W,C]
+        if arr.shape[0] in (1, 3, 4) and arr.shape[-1] not in (1, 3, 4):
+            arr = np.transpose(arr, (1, 2, 0))
+
+        if arr.dtype != np.uint8:
+            arr = np.clip(arr.astype(np.float32), 0.0, 1.0)
+            arr = (arr * 255.0).round().astype(np.uint8)
+
+        if arr.shape[-1] == 1:
+            arr = np.repeat(arr, 3, axis=-1)
+        elif arr.shape[-1] == 4:
+            # Drop alpha for VL models
+            arr = arr[..., :3]
+        elif arr.shape[-1] != 3:
+            return False, f"unsupported channel count: {arr.shape[-1]}"
+
+        pil = Image.fromarray(arr, mode="RGB")
+        w, h = pil.size
+        longest = max(w, h)
+        if max_side > 0 and longest > max_side:
+            scale = max_side / float(longest)
+            new_size = (max(1, int(w * scale)), max(1, int(h * scale)))
+            resample = getattr(Image, "Resampling", Image).LANCZOS
+            try:
+                pil = pil.resize(new_size, resample)
+            except Exception:  # noqa: BLE001
+                pil = pil.resize(new_size)
+
+        buf = io.BytesIO()
+        pil.save(buf, format="PNG", optimize=True)
+        b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+        return True, b64
+    except Exception as e:  # noqa: BLE001
+        logger.exception("Failed to encode ComfyUI image for Ollama VL")
+        return False, f"image_encode_error: {type(e).__name__}: {e}"
+
+
+def generate_with_image(
+    *,
+    ollama_url: str,
+    model: str,
+    system: str,
+    prompt: str,
+    image: Any,
+    temperature: float = 0.7,
+    max_tokens: int = 1024,
+    seed: int = 0,
+    timeout: int = 180,
+    max_side: int = 1280,
+) -> Tuple[bool, str]:
+    """Vision-language generate: encode a ComfyUI IMAGE and call Ollama.
+
+    Prefer a VL model (e.g. ``llava``, ``qwen2.5-vl``, ``gemma3``, ``minicpm-v``).
+    """
+    ok, payload = comfy_image_to_base64_png(image, max_side=max_side)
+    if not ok:
+        return False, payload
+    return generate_text(
+        ollama_url=ollama_url,
+        model=model,
+        system=system,
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        seed=seed,
+        timeout=timeout,
+        images=[payload],
+    )

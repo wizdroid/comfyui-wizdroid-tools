@@ -106,11 +106,15 @@ class WizdroidCharacterPrompt:
                 "max_tokens": (
                     "INT",
                     {
-                        "default": 256,
+                        "default": 512,
                         "min": 64,
-                        "max": 1024,
+                        "max": 2048,
                         "step": 32,
-                        "tooltip": "Maximum output tokens for AI-generated prompt.",
+                        "tooltip": (
+                            "Maximum output tokens for AI-generated prompt. "
+                            "Higher values allow the comprehensive character "
+                            "expansion (face micro-detail, fabric, lighting, etc.)."
+                        ),
                     },
                 ),
                 "spice": (
@@ -205,6 +209,17 @@ class WizdroidCharacterPrompt:
                         "tooltip": "Additional upper-body jewellery/accessories.",
                     },
                 ),
+                "extra_accessories": (
+                    "STRING",
+                    {
+                        "default": "",
+                        "multiline": False,
+                        "tooltip": (
+                            "Additional accessories (bags, props, belts, watches, "
+                            "scarves, tech gadgets, etc.). Wire preset fragments here."
+                        ),
+                    },
+                ),
                 # --- Camera ---
                 "camera_azimuth": _dropdown(
                     "camera_azimuth",
@@ -277,7 +292,7 @@ class WizdroidCharacterPrompt:
         use_ai: bool = True,
         seed: int = 0,
         temperature: float = 0.7,
-        max_tokens: int = 256,
+        max_tokens: int = 512,
         spice: int = 0,
         fantasy: int = 0,
         detail: int = 5,
@@ -296,6 +311,7 @@ class WizdroidCharacterPrompt:
         extra_face: str = "",
         extra_hair: str = "",
         extra_jewellery: str = "",
+        extra_accessories: str = "",
         lora_trigger: str = "",
         camera_azimuth: str = "random",
         camera_elevation: str = "random",
@@ -317,7 +333,7 @@ class WizdroidCharacterPrompt:
         spice = max(0, min(10, int(spice)))
         fantasy = max(0, min(10, int(fantasy)))
         detail = max(0, min(10, int(detail)))
-        max_tokens = max(64, min(1024, int(max_tokens)))
+        max_tokens = max(64, min(2048, int(max_tokens)))
 
         selections = {
             "gender": gender,
@@ -350,6 +366,7 @@ class WizdroidCharacterPrompt:
             "extra_face": extra_face,
             "extra_hair": extra_hair,
             "extra_jewellery": extra_jewellery,
+            "extra_accessories": extra_accessories,
             "lora_trigger": lora_trigger,
             "extra_outfit": extra_outfit,
             "extra_background": extra_background,
