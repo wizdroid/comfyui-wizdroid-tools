@@ -17,6 +17,7 @@ from lib.scene_prompts import (
     clamp_duration,
     get_mood_choices,
     get_style_choices,
+    get_video_model_choices,
     parse_scene_response,
 )
 
@@ -47,8 +48,20 @@ class WizdroidVLSceneGenerator:
         models = collect_models(DEFAULT_OLLAMA_URL)
         moods = get_mood_choices()
         styles = get_style_choices()
+        video_models = get_video_model_choices()
         return {
             "required": {
+                "video_model": (
+                    video_models,
+                    {
+                        "default": video_models[0] if video_models else "Generic (any video model)",
+                        "tooltip": (
+                            "Target video model. Selects model-specific meta prompts "
+                            "(MiniMax, Hunyuan 3, Wan 2.2, Grok Imagine 1.5, LTX 2.3) "
+                            "or the generic prompt set. Edit data/scene/video_models.json."
+                        ),
+                    },
+                ),
                 "image": (
                     "IMAGE",
                     {
@@ -161,6 +174,7 @@ class WizdroidVLSceneGenerator:
 
     def generate(
         self,
+        video_model: str = "generic",
         image: Any = None,
         ollama_url: str = DEFAULT_OLLAMA_URL,
         ollama_model: str = "",
@@ -187,6 +201,7 @@ class WizdroidVLSceneGenerator:
             duration_seconds=duration_seconds,
             mood=mood,
             style=style,
+            video_model=video_model,
         )
         generation_prompt = build_vl_user_prompt(
             user_prompt=user_prompt,
@@ -194,10 +209,12 @@ class WizdroidVLSceneGenerator:
             mood=mood,
             style=style,
             extra_instructions=extra_instructions,
+            video_model=video_model,
         )
 
         logger.debug(
-            "VL scene: model=%s duration=%.1fs mood=%s style=%s tokens=%d",
+            "VL scene: video_model=%s model=%s duration=%.1fs mood=%s style=%s tokens=%d",
+            video_model,
             ollama_model,
             duration_seconds,
             mood,

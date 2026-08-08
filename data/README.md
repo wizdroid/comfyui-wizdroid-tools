@@ -18,7 +18,8 @@ data/
 │   └── system.json          # system/user templates ({character_json}, guidance)
 ├── scene/                   # Video scene generators (text + VL)
 │   ├── choices.json         # mood, style dropdowns
-│   └── system.json          # text/vl system + user templates
+│   ├── system.json          # generic text/vl system + user templates
+│   └── video_models.json    # per-model meta prompts + dropdown order
 ├── rewrite/                 # LLM Text Rewriter
 │   ├── modes.json           # mode_id → label, instruction, suggested_temperature
 │   └── system.json          # base system, output rules, mode_order, templates
@@ -50,6 +51,33 @@ data/
 3. Optionally append `"noir"` to `mode_order` in `rewrite/system.json`
    (if omitted, new modes still appear after the ordered list).
 4. Refresh the ComfyUI browser page and re-add or reselect the node if needed.
+
+## Add / tweak a video model meta-prompt
+
+The scene generators (text + VL) have a `video_model` dropdown. Options come
+from `scene/video_models.json`:
+
+```json
+{
+  "model_order": ["generic", "minimax", "h3"],
+  "models": {
+    "minimax": {
+      "label": "MiniMax (Hailuo)",
+      "text_system_prompt": "…",   // {duration_seconds} {mood} {style} {extra_guidance}
+      "text_user_prompt": "…",     // {duration_seconds} {mood} {style} {user_prompt} {extra_block}
+      "vl_system_prompt": "…",
+      "vl_user_prompt": "…"
+    }
+  }
+}
+```
+
+1. Add a new key (stable id) under `models` with a `label` and the prompt
+   fields you want to override.
+2. Append the id to `model_order` to control dropdown position.
+3. The `generic` option always exists and maps to `scene/system.json` — no need
+   to add it here.
+4. Refresh the ComfyUI browser page so the dropdown reloads.
 
 ## Add a song structure
 

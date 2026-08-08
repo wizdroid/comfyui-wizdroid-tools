@@ -1,16 +1,22 @@
 """Video scene prompt assembly — templates and choices from data/scene/.
 
 Files:
-  data/scene/choices.json  — mood, style dropdowns
-  data/scene/system.json   — text + VL system/user templates
+  data/scene/choices.json       — mood, style dropdowns
+  data/scene/system.json        — generic text + VL system/user templates
+  data/scene/video_models.json  — per-model meta prompts (MiniMax, Hunyuan 3,
+                                  Wan 2.2, Grok Imagine 1.5, LTX 2.3, …)
 """
 
 from __future__ import annotations
 
 import re
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from lib.json_data import load_data_json
+
+# Stable id of the fallback model entry (maps to data/scene/system.json).
+_VIDEO_MODEL_DEFAULT_ID = "generic"
+_VIDEO_MODEL_DEFAULT_LABEL = "Generic (any video model)"
 
 _FALLBACK_CHOICES: Dict[str, List[str]] = {
     "mood": [
@@ -102,6 +108,98 @@ def get_style_choices() -> List[str]:
     return list(_load_choices().get("style") or _FALLBACK_CHOICES["style"])
 
 
+# ---------------------------------------------------------------------------
+# Per-model video meta prompts (data/scene/video_models.json)
+# ---------------------------------------------------------------------------
+
+
+def _load_video_models() -> Dict[str, Any]:
+    """Return the ``models`` map from video_models.json (id -> entry)."""
+    data = load_data_json("scene", "video_models.json", default=None)
+    if not isinstance(data, dict):
+        return {}
+    models = data.get("models")
+    if not isinstance(models, dict):
+        return {}
+    return {str(k): v for k, v in models.items() if isinstance(v, dict)}
+
+
+def _load_video_model_order() -> List[str]:
+    data = load_data_json("scene", "video_models.json", default=None)
+    if not isinstance(data, dict):
+        return []
+    order = data.get("model_order")
+    if not isinstance(order, list):
+        return []
+    return [str(x) for x in order if str(x).strip()]
+
+
+def get_video_model_choices() -> List[str]:
+    """Dropdown labels for the ``video_model`` widget.
+
+    The generic entry always appears (and comes first), followed by any
+    model ids declared in ``model_order``, then any remaining models.
+    """
+    models = _load_video_models()
+    labels: List[str] = []
+
+    def label_for(mid: str) -> str:
+        if mid == _VIDEO_MODEL_DEFAULT_ID:
+            return _VIDEO_MODEL_DEFAULT_LABEL
+        entry = models.get(mid)
+        if isinstance(entry, dict):
+            lbl = entry.get("label")
+            if isinstance(lbl, str) and lbl.strip():
+                return lbl.strip()
+        return mid
+
+    seen: set[str] = set()
+    if _VIDEO_MODEL_DEFAULT_ID not in models:
+        labels.append(_VIDEO_MODEL_DEFAULT_LABEL)
+        seen.add(_VIDEO_MODEL_DEFAULT_ID)
+    for mid in _load_video_model_order():
+        if mid in seen:
+            continue
+        seen.add(mid)
+        if mid in models or mid == _VIDEO_MODEL_DEFAULT_ID:
+            labels.append(label_for(mid))
+    for mid in models:
+        if mid not in seen:
+            seen.add(mid)
+            labels.append(label_for(mid))
+    if not labels:
+        labels.append(_VIDEO_MODEL_DEFAULT_LABEL)
+    return labels
+
+
+def get_video_model_id(label: str) -> str:
+    """Map a dropdown label back to a stable model id (JSON key)."""
+    label = (label or "").strip()
+    if not label or label == _VIDEO_MODEL_DEFAULT_LABEL:
+        return _VIDEO_MODEL_DEFAULT_ID
+    for mid, entry in _load_video_models().items():
+        if isinstance(entry, dict) and str(entry.get("label", "")).strip() == label:
+            return mid
+    # Unknown label: fall back to generic rather than guessing.
+    return _VIDEO_MODEL_DEFAULT_ID
+
+
+def _get_model_template(video_model: str, key: str, generic_value: str) -> str:
+    """Return a model-specific template for ``key``, else the generic one.
+
+    ``video_model`` may be a dropdown label or a raw id; anything unknown
+    resolves to the generic template.
+    """
+    mid = get_video_model_id(video_model)
+    if mid != _VIDEO_MODEL_DEFAULT_ID:
+        entry = _load_video_models().get(mid)
+        if isinstance(entry, dict):
+            val = entry.get(key)
+            if isinstance(val, str) and val.strip():
+                return val
+    return generic_value
+
+
 def _format_extra_block(extra_instructions: str) -> str:
     text = (extra_instructions or "").strip()
     if not text:
@@ -115,9 +213,11 @@ def build_text_system_prompt(
     mood: str,
     style: str,
     extra_guidance: str = "",
+    video_model: str = _VIDEO_MODEL_DEFAULT_ID,
 ) -> str:
     system = _load_system()
-    template = system.get("text_system_template") or _FALLBACK_SYSTEM["text_system_template"]
+    generic = system.get("text_system_template") or _FALLBACK_SYSTEM["text_system_template"]
+    template = _get_model_template(video_model, "text_system_prompt", generic)
     guidance = (extra_guidance or "").strip() or system.get(
         "extra_guidance_default", _FALLBACK_SYSTEM["extra_guidance_default"]
     )
@@ -136,9 +236,11 @@ def build_text_user_prompt(
     mood: str,
     style: str,
     extra_instructions: str = "",
+    video_model: str = _VIDEO_MODEL_DEFAULT_ID,
 ) -> str:
     system = _load_system()
-    template = system.get("text_user_template") or _FALLBACK_SYSTEM["text_user_template"]
+    generic = system.get("text_user_template") or _FALLBACK_SYSTEM["text_user_template"]
+    template = _get_model_template(video_model, "text_user_prompt", generic)
     return template.format(
         user_prompt=(user_prompt or "").strip(),
         duration_seconds=_fmt_duration(duration_seconds),
@@ -154,9 +256,11 @@ def build_vl_system_prompt(
     mood: str,
     style: str,
     extra_guidance: str = "",
+    video_model: str = _VIDEO_MODEL_DEFAULT_ID,
 ) -> str:
     system = _load_system()
-    template = system.get("vl_system_template") or _FALLBACK_SYSTEM["vl_system_template"]
+    generic = system.get("vl_system_template") or _FALLBACK_SYSTEM["vl_system_template"]
+    template = _get_model_template(video_model, "vl_system_prompt", generic)
     guidance = (extra_guidance or "").strip() or system.get(
         "extra_guidance_default", _FALLBACK_SYSTEM["extra_guidance_default"]
     )
@@ -175,9 +279,11 @@ def build_vl_user_prompt(
     mood: str,
     style: str,
     extra_instructions: str = "",
+    video_model: str = _VIDEO_MODEL_DEFAULT_ID,
 ) -> str:
     system = _load_system()
-    template = system.get("vl_user_template") or _FALLBACK_SYSTEM["vl_user_template"]
+    generic = system.get("vl_user_template") or _FALLBACK_SYSTEM["vl_user_template"]
+    template = _get_model_template(video_model, "vl_user_prompt", generic)
     direction = (user_prompt or "").strip() or (
         "Animate this image naturally with subtle motion matching the mood and style."
     )

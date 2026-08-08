@@ -143,6 +143,7 @@ Text-only scene package for AI **video** workflows (and a keyframe image prompt)
 
 | Input | Type | Notes |
 |-------|------|--------|
+| `video_model` | dropdown | Target video model — picks model-specific meta prompts |
 | `ollama_url` / `ollama_model` | STRING / dropdown | Text LLM (vision not required) |
 | `user_prompt` | STRING multiline | Scene idea |
 | `duration_seconds` | FLOAT 0.5–120 | Target clip length |
@@ -151,6 +152,12 @@ Text-only scene package for AI **video** workflows (and a keyframe image prompt)
 | `temperature` / `max_tokens` | FLOAT / INT | Sampling |
 | `extra_instructions` | STRING optional | Extra constraints |
 | `seed` | INT optional | 0 = random |
+
+`video_model` options: `Generic (any video model)` (default), `MiniMax
+(Hailuo)`, `Hunyuan 3 (H3)`, `Wan 2.2`, `Grok Imagine 1.5`, `LTX 2.3`. Each
+uses its own system/user meta prompts tuned for that model; the generic option
+uses the shared templates. Add or tweak models in
+`data/scene/video_models.json` (page refresh re-reads the dropdown).
 
 Outputs:
 
@@ -161,7 +168,7 @@ Outputs:
 | `image_prompt` | Still keyframe prompt (T2I → I2V) |
 | `raw` | Full model response |
 
-Data: `data/scene/choices.json`, `system.json`.
+Data: `data/scene/choices.json`, `system.json`, `video_models.json`.
 
 ---
 
@@ -175,6 +182,7 @@ dialogue, and a refined keyframe prompt. Use a VL Ollama model
 
 | Input | Type | Notes |
 |-------|------|--------|
+| `video_model` | dropdown | Target video model — picks model-specific meta prompts |
 | `image` | IMAGE | Source frame (ComfyUI IMAGE tensor) |
 | `ollama_url` / `ollama_model` | STRING / dropdown | **Vision** model required |
 | `user_prompt` | STRING multiline | Direction (empty = subtle natural motion) |
@@ -184,6 +192,9 @@ dialogue, and a refined keyframe prompt. Use a VL Ollama model
 | `extra_instructions` | STRING optional | Extra constraints |
 | `seed` | INT optional | 0 = random |
 | `max_image_side` | INT optional | Downscale longest side before VL (default 1280) |
+
+Same `video_model` options as the LLM Video Scene Generator (generic +
+per-model meta prompts from `data/scene/video_models.json`).
 
 Outputs: same as LLM Video Scene Generator (`scene_prompt`, `dialogue`,
 `image_prompt`, `raw`).
