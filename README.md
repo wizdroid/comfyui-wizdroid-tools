@@ -201,7 +201,61 @@ Outputs: same as LLM Video Scene Generator (`scene_prompt`, `dialogue`,
 
 ---
 
-### 5. LLM Lyrics Generator
+### 5. VL Image Extract
+
+Class: `WizdroidVLExtract`
+
+Vision-language **extract** from a source image: reverse prompt, outfit
+flatlay, makeup, wardrobe breakdown, and more. Use a VL Ollama model
+(`llava`, `qwen2.5-vl`, `gemma3`, `minicpm-v`, …).
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `image` | IMAGE | Source frame (ComfyUI IMAGE tensor) |
+| `mode` | dropdown | What to extract (see modes below) |
+| `ollama_url` / `ollama_model` | STRING / dropdown | **Vision** model required |
+| `spice` | INT 0–10 | SFW → explicit NSFW (describes content *in* the image) |
+| `detail` | INT 0–10 | Minimal → dense extract |
+| `temperature` / `max_tokens` | FLOAT / INT | Sampling |
+| `extra_instructions` | STRING optional | Focus / custom extract direction |
+| `seed` | INT optional | 0 = random |
+| `max_image_side` | INT optional | Downscale longest side before VL (default 1280) |
+
+Modes (ids / labels from `data/vl_extract/modes.json`):
+
+```
+image_prompt          Image prompt (full reverse)
+outfit_flatlay        Outfit / accessories flatlay
+wardrobe_breakdown    Wardrobe breakdown (itemized)
+makeup                Makeup description
+hairstyle             Hairstyle description
+accessories           Accessories inventory
+jewelry_and_piercings Jewelry & piercings
+tattoos_and_markings  Tattoos & body markings
+pose_and_body         Pose & body
+full_character        Full character appearance
+scene_environment     Scene / environment
+style_aesthetic       Style / aesthetic tags
+custom                Custom extraction
+```
+
+`spice` reuses `data/prompts/spice.json` so high values allow accurate
+adult/NSFW description of what is visible (still forbids illegal content).
+Edit modes in JSON and refresh the ComfyUI page to extend the dropdown.
+
+Outputs:
+
+| Name | Type | Meaning |
+|------|------|---------|
+| `text` | STRING | Cleaned extract (prompt fragments / paragraph) |
+| `raw` | STRING | Full model response before sanitize |
+
+Data: `data/vl_extract/modes.json`, `system.json`; spice/detail from
+`data/prompts/`.
+
+---
+
+### 6. LLM Lyrics Generator
 
 Class: `WizdroidLLMLyricsGenerator`
 
@@ -239,7 +293,7 @@ Data: `data/lyrics/structures.json`, `choices.json`, `system.json`.
 
 ---
 
-### 6. LLM Text Rewriter
+### 7. LLM Text Rewriter
 
 Class: `WizdroidLLMTextRewriter`
 
@@ -278,7 +332,7 @@ Data: `data/rewrite/modes.json`, `system.json`.
 
 ---
 
-### 7. Presets (plugin-style)
+### 8. Presets (plugin-style)
 
 Category: `🧙 Wizdroid/Presets`
 
@@ -339,6 +393,7 @@ data/
   prompts/      # image prompt generator + character AI guidance
   character/    # character dropdowns + templates
   scene/        # video scene mood/style + VL/text templates
+  vl_extract/   # VL image extract modes + system templates
   lyrics/       # ACE-Step structures, choices, templates
   rewrite/      # text rewriter modes + templates
   presets/      # plugin-style preset catalogs (one JSON → one node)
@@ -362,11 +417,13 @@ comfyui-wizdroid-tools/
   requirements.txt
   data/                       # all editable prompts and choices
   lib/
-    ollama_client.py          # /api/tags + /api/generate
+    ollama_client.py          # /api/tags + /api/generate (+ VL images)
     json_data.py              # mtime-cached JSON load
     constants.py
     prompts.py                # image prompt templates
     character_prompts.py      # character resolve + template
+    scene_prompts.py          # video scene text/VL templates
+    vl_extract_prompts.py     # VL image extract modes
     lyrics_prompts.py
     rewrite_prompts.py
     presets.py                # discover + format preset catalogs
@@ -375,6 +432,7 @@ comfyui-wizdroid-tools/
     llm_character_prompt.py
     llm_scene_generator.py    # text → video scene package
     llm_vl_scene_generator.py # image + text → video scene package
+    llm_vl_extract.py         # image → prompt / flatlay / makeup / …
     llm_lyrics_generator.py
     llm_text_rewriter.py
     llm_qwen_multi_angles.py

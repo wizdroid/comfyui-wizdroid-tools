@@ -13,12 +13,15 @@ Includes:
   (96 camera poses).
 - LLM / VL Video Scene Generators: timed scene + dialogue + keyframe prompt
   for video pipelines (text-only or vision-language from a source image).
+- VL Image Extract: vision-language reverse of a source image into a prompt,
+  outfit flatlay, makeup description, or other selectable extract mode
+  (spice-aware NSFW).
 - Presets: data-driven dropdown + details nodes (footwear, headgear, makeup,
   …). Drop a new JSON under ``data/presets/`` and restart ComfyUI to get a
   new node — plugin-style catalogs, no Python edits.
 """
 
-__version__ = "2026.07.30"
+__version__ = "2026.08.10"
 
 import sys
 from pathlib import Path
@@ -93,6 +96,10 @@ _vl_scene_nodes = _import_node_module("llm_vl_scene_generator")
 VL_SCENE_NODE_CLASS_MAPPINGS = _vl_scene_nodes.NODE_CLASS_MAPPINGS
 VL_SCENE_DISPLAY_NAME_MAPPINGS = _vl_scene_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
+_vl_extract_nodes = _import_node_module("llm_vl_extract")
+VL_EXTRACT_NODE_CLASS_MAPPINGS = _vl_extract_nodes.NODE_CLASS_MAPPINGS
+VL_EXTRACT_DISPLAY_NAME_MAPPINGS = _vl_extract_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
 # Preset nodes are data-driven: one node class per data/presets/*.json file.
 _preset_nodes = _import_node_module("preset_nodes")
 PRESET_NODE_CLASS_MAPPINGS = _preset_nodes.NODE_CLASS_MAPPINGS
@@ -110,6 +117,7 @@ NODE_CLASS_MAPPINGS = {
     **QWEN_MULTI_ANGLES_CLASS_MAPPINGS,
     **SCENE_NODE_CLASS_MAPPINGS,
     **VL_SCENE_NODE_CLASS_MAPPINGS,
+    **VL_EXTRACT_NODE_CLASS_MAPPINGS,
     **PRESET_NODE_CLASS_MAPPINGS,
 }
 
@@ -121,5 +129,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **QWEN_MULTI_ANGLES_DISPLAY_NAME_MAPPINGS,
     **SCENE_DISPLAY_NAME_MAPPINGS,
     **VL_SCENE_DISPLAY_NAME_MAPPINGS,
+    **VL_EXTRACT_DISPLAY_NAME_MAPPINGS,
     **PRESET_NODE_DISPLAY_NAME_MAPPINGS,
 }

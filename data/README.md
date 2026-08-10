@@ -20,6 +20,9 @@ data/
 │   ├── choices.json         # mood, style dropdowns
 │   ├── system.json          # generic text/vl system + user templates
 │   └── video_models.json    # per-model meta prompts + dropdown order
+├── vl_extract/              # VL Image Extract (modes + templates)
+│   ├── modes.json           # mode_id → label, instruction, suggested_*
+│   └── system.json          # base system, mode_order, user template
 ├── rewrite/                 # LLM Text Rewriter
 │   ├── modes.json           # mode_id → label, instruction, suggested_temperature
 │   └── system.json          # base system, output rules, mode_order, templates
@@ -78,6 +81,27 @@ from `scene/video_models.json`:
 3. The `generic` option always exists and maps to `scene/system.json` — no need
    to add it here.
 4. Refresh the ComfyUI browser page so the dropdown reloads.
+
+## Add a VL extract mode
+
+1. Open `vl_extract/modes.json`.
+2. Add a new key (stable id):
+
+```json
+"nails": {
+  "label": "Nail description",
+  "instruction": "Mode: Nails.\nDescribe nail shape, length, color, art, and finish only.",
+  "suggested_temperature": 0.3,
+  "suggested_max_tokens": 256
+}
+```
+
+3. Optionally append `"nails"` to `mode_order` in `vl_extract/system.json`
+   (if omitted, new modes still appear after the ordered list).
+4. Refresh the ComfyUI browser page.
+
+Spice/detail for NSFW density still come from `prompts/spice.json` and
+`prompts/detail.json` (shared with the image prompt generator).
 
 ## Add a song structure
 

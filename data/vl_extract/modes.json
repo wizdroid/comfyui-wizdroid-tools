@@ -1,0 +1,80 @@
+{
+  "image_prompt": {
+    "label": "Image prompt (full reverse)",
+    "instruction": "Mode: Image prompt (full reverse).\nWrite ONE single-paragraph image-generation prompt that would recreate this frame as closely as possible.\nInclude subject, pose, face/expression, hair, body, clothing (or lack of clothing), makeup, accessories, props, setting, lighting, camera framing, and art/media style when visible.\nDo not use section headers or bullet lists. No \"a photo of\" fluff unless it improves model quality.\nAt high spice: include explicit anatomical / sexual detail when present in the image.",
+    "suggested_temperature": 0.35,
+    "suggested_max_tokens": 512
+  },
+  "outfit_flatlay": {
+    "label": "Outfit / accessories flatlay",
+    "instruction": "Mode: Outfit / accessories flatlay.\nDescribe the worn clothing and accessories as a product-style FLATLAY (items laid out neatly as if photographed from above for a catalog or styling board).\nList each garment and accessory as a separate fragment: type, color, material, cut/silhouette, pattern, hardware, and notable details.\nIgnore face, body anatomy, pose, and background except when a garment drape implies cut.\nIf the subject is nude or partially nude, list only actual garments/accessories present (or state \"no clothing\" / list underwear only).\nOutput as a comma-separated prompt-ready flatlay list, not a story.\nAt high spice: include lingerie, bondage gear, fetish wear, and intimate accessories accurately when visible.",
+    "suggested_temperature": 0.3,
+    "suggested_max_tokens": 512
+  },
+  "wardrobe_breakdown": {
+    "label": "Wardrobe breakdown (itemized)",
+    "instruction": "Mode: Wardrobe breakdown (itemized).\nItemize every clothing piece visible, grouped by category when possible:\ntop, bottom, outerwear, underwear/lingerie, hosiery, footwear, headgear, gloves, neckwear.\nFor each piece: color, fabric/material, fit, length, closures, prints/patterns, wear state if obvious.\nOne short line or fragment per piece; skip empty categories.\nAt high spice: describe sheer, revealing, fetish, or explicit garments without euphemism when they are in the image.",
+    "suggested_temperature": 0.3,
+    "suggested_max_tokens": 512
+  },
+  "makeup": {
+    "label": "Makeup description",
+    "instruction": "Mode: Makeup description.\nExtract a detailed makeup look: base/skin finish, foundation coverage if visible, contour/highlight, blush, eyeshadow palette and placement, eyeliner style, lashes/mascara, brows, lips (color + finish), freckles or face jewels if applied as makeup, and overall glam level (natural / soft glam / full glam / editorial / etc.).\nIf bare face / no makeup is clear, say so.\nOutput as comma-separated prompt fragments suitable for image models.\nAt high spice: include body makeup, nipple makeup, explicit face paint, or smutty beauty styling when visible.",
+    "suggested_temperature": 0.3,
+    "suggested_max_tokens": 384
+  },
+  "hairstyle": {
+    "label": "Hairstyle description",
+    "instruction": "Mode: Hairstyle description.\nDescribe hair only: color (including roots/highlights/dyed sections), length, texture, cut/style, parting, bangs, volume, styling (wet, sleek, messy, braids, updo, etc.), hair accessories, and any visible body hair only if clearly styled/intentional as part of the look.\nOutput as comma-separated prompt fragments.\nIgnore clothing and background.",
+    "suggested_temperature": 0.3,
+    "suggested_max_tokens": 256
+  },
+  "accessories": {
+    "label": "Accessories inventory",
+    "instruction": "Mode: Accessories inventory.\nList worn and held accessories only (not core clothing): bags, belts, scarves, eyewear, watches, hats (if accessory-like), gloves, props in hand, tech, costume pieces, etc.\nFor each: type, color, material, placement, and distinctive details.\nComma-separated fragments. If none, say \"no accessories\".\nAt high spice: include collars, leashes, cuffs, plugs (if external/visible), and other fetish accessories when present.",
+    "suggested_temperature": 0.3,
+    "suggested_max_tokens": 384
+  },
+  "jewelry_and_piercings": {
+    "label": "Jewelry & piercings",
+    "instruction": "Mode: Jewelry & piercings.\nInventory all visible jewelry and piercings: earrings, necklaces, chokers, bracelets, rings, anklets, body chains, belly rings, nipple piercings, genital jewelry if visible, facial piercings, gauges, etc.\nNote metal color, stone colors, size, and placement.\nComma-separated fragments. If none, say \"no jewelry or piercings\".\nAt high spice: describe intimate jewelry accurately when visible; do not invent it.",
+    "suggested_temperature": 0.3,
+    "suggested_max_tokens": 256
+  },
+  "tattoos_and_markings": {
+    "label": "Tattoos & body markings",
+    "instruction": "Mode: Tattoos & body markings.\nDescribe visible tattoos, scars, birthmarks, freckle patterns, temporary body paint, henna, and similar markings.\nFor tattoos: location, approximate size, style (blackwork, neo-trad, script, …), and readable subject matter when clear.\nDo not invent tattoos that are not visible. If none, say \"no tattoos or body markings\".\nComma-separated or short clause list.",
+    "suggested_temperature": 0.3,
+    "suggested_max_tokens": 384
+  },
+  "pose_and_body": {
+    "label": "Pose & body",
+    "instruction": "Mode: Pose & body.\nDescribe body type/shape, approximate age presentation (adult only), skin tone, notable anatomy visible, stance/pose, hand/arm/leg placement, gaze/expression, and camera angle relative to the body.\nDo not invent a different body. Clothing is secondary (only note how it reveals/hides form).\nAt high spice: describe breasts, genitals, buttocks, arousal cues, and explicit posing accurately when visible — no soft-focus euphemisms at spice 8+.",
+    "suggested_temperature": 0.35,
+    "suggested_max_tokens": 384
+  },
+  "full_character": {
+    "label": "Full character appearance",
+    "instruction": "Mode: Full character appearance.\nWrite a comprehensive character appearance block covering: demographics presentation, face, eyes, expression, hair, body, pose, full wardrobe, makeup, jewelry, tattoos/markings, accessories, and any held props.\nStay faithful to the image. Output as a dense single paragraph or tightly grouped comma fragments suitable for character prompting.\nAt high spice: include explicit NSFW appearance details when the image shows them.",
+    "suggested_temperature": 0.35,
+    "suggested_max_tokens": 640
+  },
+  "scene_environment": {
+    "label": "Scene / environment",
+    "instruction": "Mode: Scene / environment.\nDescribe only setting and atmosphere: location type, architecture/furniture, time of day, weather if outdoor, lighting quality/color, depth of field, background props, and mood of the space.\nIgnore character identity and clothing except as silhouettes that define space.\nComma-separated or short paragraph. If pure studio void/seamless, say so.",
+    "suggested_temperature": 0.35,
+    "suggested_max_tokens": 384
+  },
+  "style_aesthetic": {
+    "label": "Style / aesthetic tags",
+    "instruction": "Mode: Style / aesthetic tags.\nExtract visual style tokens useful for image models: medium (photo, illustration, 3D, anime, …), render quality, color grade, fashion aesthetic, era, subculture, lens look, and any recognizable art style cues.\nPrefer tag-like fragments (e.g. \"film still, 85mm, soft rim light, cyberpunk fashion editorial\").\nDo not invent famous artist names unless the image clearly pastiches a well-known style; prefer generic style descriptors when unsure.",
+    "suggested_temperature": 0.35,
+    "suggested_max_tokens": 256
+  },
+  "custom": {
+    "label": "Custom extraction",
+    "instruction": "Mode: Custom extraction.\nFollow the user's custom instruction / extra direction for what to extract from the image.\nIf the custom instruction is empty, fall back to a full image-prompt reverse of the frame.\nStill ground claims in the visible image and honor spice/detail guidance.",
+    "suggested_temperature": 0.4,
+    "suggested_max_tokens": 512
+  }
+}
