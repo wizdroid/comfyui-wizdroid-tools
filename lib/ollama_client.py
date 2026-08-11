@@ -112,17 +112,38 @@ def _build_generate_options(
     return opts
 
 
+def _extract_message_content(msg: Any) -> str:
+    """Pull text from an Ollama message, handling list-shaped multimodal content."""
+    if not isinstance(msg, dict):
+        return ""
+    content = msg.get("content")
+    if isinstance(content, list):
+        parts: List[str] = []
+        for part in content:
+            if isinstance(part, dict):
+                parts.append(str(part.get("text", "")))
+            else:
+                parts.append(str(part))
+        return "".join(parts).strip()
+    return (content or "").strip()
+
+
 def _extract_generate_text(data: Dict[str, Any], raw_text: str) -> str:
-    """Pull response text from an Ollama generate/chat-shaped payload."""
-    msg = data.get("message")
-    if isinstance(msg, dict):
-        out = (msg.get("content") or "").strip()
-        if out:
-            return out
+    """Pull response text from an Ollama generate/chat-shaped payload.
+
+    Checks ``message.content`` (string or list of parts) then ``response``.
+    It deliberately does NOT fall back to the raw JSON, so callers never see
+    the raw payload (which previously polluted caption/output files), and it
+    does NOT return the ``thinking`` trace — that lets the ``length`` retry in
+    :func:`generate_text` give the model a bigger budget to finish a real answer.
+    """
+    out = _extract_message_content(data.get("message"))
+    if out:
+        return out
     out = (data.get("response") or "").strip()
     if out:
         return out
-    return (raw_text or "").strip()
+    return ""
 
 
 def generate_text(
@@ -196,16 +217,24 @@ def generate_text(
     if out:
         return True, out
 
-    # Check if thinking consumed all tokens — retry with higher budget
+    # Thinking models (gemma/qwen/etc.) can burn the whole token budget on
+    # internal reasoning before writing the answer (done_reason == "length"),
+    # leaving `response` empty. Retry with a growing budget and think disabled
+    # until there is room for a real answer (capped so we never loop forever).
+    MAX_RETRY_TOKENS = 8192
+    budget = opts.get("num_predict", 512)
     done_reason = (data.get("done_reason") or "").lower()
-    if done_reason == "length" and opts.get("num_predict", 512) < 4096:
-        opts["num_predict"] = min(opts.get("num_predict", 512) * 2, 4096)
+    while done_reason == "length" and budget < MAX_RETRY_TOKENS:
+        budget = min(budget * 4, MAX_RETRY_TOKENS)
+        opts["num_predict"] = budget
         opts["think"] = 0
         ok2, raw2, data2 = _do_request(opts)
-        if ok2 and isinstance(data2, dict):
-            out2 = _extract_generate_text(data2, raw2)
-            if out2:
-                return True, out2
+        if not ok2 or not isinstance(data2, dict):
+            break
+        out2 = _extract_generate_text(data2, raw2)
+        if out2:
+            return True, out2
+        done_reason = (data2.get("done_reason") or "").lower()
 
     return False, "empty_response"
 

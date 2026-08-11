@@ -5,6 +5,11 @@ Includes:
   control over spice, fantasy, and detail levels.
 - LLM Prompt from Website: fetch a web page, extract its text, and generate a
   character image prompt via Ollama from that source material.
+- Batch Image Captioner: caption every image in a folder (VL model) and write
+  <name>.txt caption files for LoRA dataset training.
+- Image Critique: VL critique of a generated image → critique + revised prompt.
+- Image Prompt Refiner: iterative prompt refinement (optional VL reference
+  image + in-session memory).
 - Character Prompt Generator: Build a character via dropdowns, then generate
   an image prompt via Ollama or a plain template.
 - LLM Lyrics Generator: ACE-Step 1.5 structured lyrics + tags via Ollama.
@@ -117,6 +122,21 @@ _website_prompt_nodes = _import_node_module("llm_website_prompt")
 WEBSITE_PROMPT_NODE_CLASS_MAPPINGS = _website_prompt_nodes.NODE_CLASS_MAPPINGS
 WEBSITE_PROMPT_NODE_DISPLAY_NAME_MAPPINGS = _website_prompt_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
+# Batch image captioning for LoRA dataset prep (VL, folder → .txt files).
+_batch_caption_nodes = _import_node_module("llm_batch_captioner")
+BATCH_CAPTION_NODE_CLASS_MAPPINGS = _batch_caption_nodes.NODE_CLASS_MAPPINGS
+BATCH_CAPTION_NODE_DISPLAY_NAME_MAPPINGS = _batch_caption_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
+# Vision critique of a generated image → revised prompt.
+_critique_nodes = _import_node_module("llm_image_critique")
+CRITIQUE_NODE_CLASS_MAPPINGS = _critique_nodes.NODE_CLASS_MAPPINGS
+CRITIQUE_NODE_DISPLAY_NAME_MAPPINGS = _critique_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
+# Iterative image prompt refiner (optional VL + in-session memory).
+_refiner_nodes = _import_node_module("llm_image_refiner")
+REFINER_NODE_CLASS_MAPPINGS = _refiner_nodes.NODE_CLASS_MAPPINGS
+REFINER_NODE_DISPLAY_NAME_MAPPINGS = _refiner_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
 # ---------------------------------------------------------------------------
 # Combined mappings for ComfyUI
 # ---------------------------------------------------------------------------
@@ -133,6 +153,9 @@ NODE_CLASS_MAPPINGS = {
     **PRESET_NODE_CLASS_MAPPINGS,
     **WEB_IMAGE_NODE_CLASS_MAPPINGS,
     **WEBSITE_PROMPT_NODE_CLASS_MAPPINGS,
+    **BATCH_CAPTION_NODE_CLASS_MAPPINGS,
+    **CRITIQUE_NODE_CLASS_MAPPINGS,
+    **REFINER_NODE_CLASS_MAPPINGS,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -147,4 +170,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **PRESET_NODE_DISPLAY_NAME_MAPPINGS,
     **WEB_IMAGE_NODE_DISPLAY_NAME_MAPPINGS,
     **WEBSITE_PROMPT_NODE_DISPLAY_NAME_MAPPINGS,
+    **BATCH_CAPTION_NODE_DISPLAY_NAME_MAPPINGS,
+    **CRITIQUE_NODE_DISPLAY_NAME_MAPPINGS,
+    **REFINER_NODE_DISPLAY_NAME_MAPPINGS,
 }

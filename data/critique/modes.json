@@ -1,0 +1,22 @@
+{
+  "general": {
+    "label": "General critique",
+    "instruction": "Assess overall quality: anatomy, composition, lighting, style fidelity, and prompt adherence."
+  },
+  "anatomy_focus": {
+    "label": "Anatomy focus",
+    "instruction": "Focus on anatomy and body structure: hands, fingers, faces, proportions, posture, and limbs. Note any distortions or inconsistencies."
+  },
+  "composition_focus": {
+    "label": "Composition focus",
+    "instruction": "Focus on composition and framing: subject placement, rule of thirds, cropping, balance, negative space, and focal point."
+  },
+  "lighting_focus": {
+    "label": "Lighting focus",
+    "instruction": "Focus on lighting: source direction, shadows, highlights, exposure, mood, and color grading."
+  },
+  "style_fidelity": {
+    "label": "Style fidelity",
+    "instruction": "Focus on how faithfully the image matches the intended art style and the written prompt's details."
+  }
+}

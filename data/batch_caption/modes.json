@@ -1,0 +1,18 @@
+{
+  "booru_tags": {
+    "label": "Booru tags (comma-separated)",
+    "instruction": "Write comma-separated danbooru-style tags covering the subject, pose, clothing, background, and art style. Include relevant quality tags (e.g. masterpiece, best quality, highres). No sentences, no explanations, no periods."
+  },
+  "natural_caption": {
+    "label": "Natural sentence",
+    "instruction": "Write one natural, grammatically correct English sentence describing the image and its subject."
+  },
+  "detailed_caption": {
+    "label": "Detailed description",
+    "instruction": "Write a detailed multi-sentence description covering the subject, pose, clothing, background, lighting, mood, and art style."
+  },
+  "short_caption": {
+    "label": "Short caption",
+    "instruction": "Write a very short caption of 3 to 8 words that captures the essence of the image."
+  }
+}

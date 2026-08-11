@@ -460,6 +460,93 @@ Tip: for JS-rendered pages (e.g. Pinterest's client UI) prefer a URL whose
 
 ---
 
+### 11. Batch Image Captioner (LoRA dataset prep)
+
+Category: `🧙 Wizdroid/LLM`
+
+Point at a **folder of images**; a vision-language model writes a
+`<name>.txt` caption next to each image — exactly what you need to build a
+training set for LoRA/dreambooth. Skips images that already have a caption
+(unless overwrite is on), and can recurse into subfolders.
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `folder_path` | STRING | Absolute path to the image folder |
+| `ollama_url` / `ollama_model` | STRING / dropdown | VL model required |
+| `caption_mode` | dropdown | Booru tags / natural sentence / detailed / short (from `data/batch_caption/modes.json`) |
+| `temperature` | FLOAT | Lower for faithful captions |
+| `max_tokens` | INT | Caption length budget |
+| `max_images` | INT | Cap per run |
+| `max_image_side` | INT | Downscale before sending |
+| `overwrite` | BOOLEAN | Re-caption existing `.txt` |
+| `recursive` | BOOLEAN | Include subfolders |
+| `extra_instructions` (opt) | STRING | e.g. `always include the character name` |
+
+| Output | Type | Meaning |
+|--------|------|---------|
+| `report` | STRING | Counts + errors summary |
+| `last_caption` | STRING | Last caption written |
+| `processed` / `failed` | INT | Counts |
+
+---
+
+### 12. Image Critique
+
+Category: `🧙 Wizdroid/LLM`
+
+Feed a generated **IMAGE** + the **prompt** that made it; a VL model critiques
+it and writes a **revised, improved prompt**. Focus dropdown (general, anatomy,
+composition, lighting, style fidelity) from `data/critique/modes.json`.
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `image` | IMAGE | Generated image to critique |
+| `prompt` | STRING | The prompt used |
+| `focus` | dropdown | Critique focus area |
+| `extra_instructions` (opt) | STRING | e.g. `fix the hands` |
+| `seed`, `max_image_side` (opt) | INT | Reproducibility / downscale |
+
+| Output | Type | Meaning |
+|--------|------|---------|
+| `critique` | STRING | Concise critique bullet points |
+| `revised_prompt` | STRING | Improved prompt |
+| `raw` | STRING | Full model response |
+
+---
+
+### 13. Image Prompt Refiner
+
+Category: `🧙 Wizdroid/LLM`
+
+Iteratively refine an image prompt with a change request. Wire the
+`refined_prompt` back into `current_prompt` for a loop, or turn on
+**session memory** — the node remembers the last refined prompt per
+`session_id` and uses it as the base on the next run. Optionally attach a
+reference **IMAGE** so the VL model can see what it's iterating on.
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `current_prompt` | STRING | Prompt to refine (or stored one with memory) |
+| `instruction` | STRING | What to change, e.g. `make the lighting dramatic` |
+| `image` (opt) | IMAGE | Reference image (needs a VL model) |
+| `use_session_memory` | BOOLEAN | Remember last refined prompt per `session_id` |
+| `session_id` | STRING | Memory key |
+| `clear_memory` (opt) | BOOLEAN | Reset the session before refining |
+| `extra_instructions`, `seed`, `max_image_side` (opt) | – | Extras |
+
+| Output | Type | Meaning |
+|--------|------|---------|
+| `refined_prompt` | STRING | The refined prompt |
+| `revision_note` | STRING | One-line summary of what changed |
+| `raw` | STRING | Full model response |
+
+> **Note on thinking models (qwen3, gemma, …):** these can spend a large token
+> budget on internal reasoning before answering. The Ollama client now retries
+> automatically with a larger budget, so results are correct but can be slower.
+> If a run times out, try a model with more headroom or lower `max_tokens`.
+
+---
+
 ## Data directory
 
 Nothing important is hard-coded. Edit JSON, save, refresh the ComfyUI page
@@ -472,7 +559,12 @@ data/
   scene/        # video scene mood/style + VL/text templates
   vl_extract/   # VL image extract modes + system templates
   lyrics/       # ACE-Step structures, choices, templates
-  rewrite/      # text rewriter modes + templates  website/     # website → character image prompt meta-prompts  presets/      # plugin-style preset catalogs (one JSON → one node)
+  rewrite/      # text rewriter modes + templates
+  website/      # website → character image prompt meta-prompts
+  batch_caption/ # batch captioner modes + templates
+  critique/     # image critique focus modes + templates
+  refine/       # iterative prompt refiner templates
+  presets/      # plugin-style preset catalogs (one JSON → one node)
 ```
 
 JSON is reloaded when mtime changes. Invalid JSON falls back to small
