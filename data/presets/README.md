@@ -95,3 +95,9 @@ Refresh the browser page; the new option appears in the Footwear node dropdown.
 | `goth_sets.json` | Complete Goth Set |
 | `characters.json` | Character Set |
 | `anime_cosplay.json` | Anime Cosplay Set |
+| `candid_mini_dresses.json` | Candid Mini Dress Set |
+| `glamorous_bodycon_dresses.json` | Glamorous Bodycon Dress Set |
+| `indian_casual_everyday.json` | Indian Casual Everyday Set |
+| `indian_chudidar_sets.json` | Indian Chudidar Set |
+| `indian_lehenga_sets.json` | Indian Lehenga Set |
+| `indian_sari_drapes.json` | Indian Sari Drape Set |
