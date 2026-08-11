@@ -92,3 +92,6 @@ Refresh the browser page; the new option appears in the Footwear node dropdown.
 | `accessories.json` | Accessories |
 | `props.json` | Props |
 | `weapons.json` | Weapons |
+| `goth_sets.json` | Complete Goth Set |
+| `characters.json` | Character Set |
+| `anime_cosplay.json` | Anime Cosplay Set |

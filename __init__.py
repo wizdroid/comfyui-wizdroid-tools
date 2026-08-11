@@ -3,6 +3,8 @@
 Includes:
 - LLM Prompt Generator: Generate image prompts via Ollama with fine-grained
   control over spice, fantasy, and detail levels.
+- LLM Prompt from Website: fetch a web page, extract its text, and generate a
+  character image prompt via Ollama from that source material.
 - Character Prompt Generator: Build a character via dropdowns, then generate
   an image prompt via Ollama or a plain template.
 - LLM Lyrics Generator: ACE-Step 1.5 structured lyrics + tags via Ollama.
@@ -21,7 +23,7 @@ Includes:
   new node — plugin-style catalogs, no Python edits.
 """
 
-__version__ = "2026.08.10"
+__version__ = "2026.08.11"
 
 import sys
 from pathlib import Path
@@ -105,6 +107,16 @@ _preset_nodes = _import_node_module("preset_nodes")
 PRESET_NODE_CLASS_MAPPINGS = _preset_nodes.NODE_CLASS_MAPPINGS
 PRESET_NODE_DISPLAY_NAME_MAPPINGS = _preset_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
+# Load image from a web URL (direct link or page like Pinterest).
+_web_image_node = _import_node_module("wizdroid_image_from_url")
+WEB_IMAGE_NODE_CLASS_MAPPINGS = _web_image_node.NODE_CLASS_MAPPINGS
+WEB_IMAGE_NODE_DISPLAY_NAME_MAPPINGS = _web_image_node.NODE_DISPLAY_NAME_MAPPINGS
+
+# Extract text from a website and generate a character image prompt via Ollama.
+_website_prompt_nodes = _import_node_module("llm_website_prompt")
+WEBSITE_PROMPT_NODE_CLASS_MAPPINGS = _website_prompt_nodes.NODE_CLASS_MAPPINGS
+WEBSITE_PROMPT_NODE_DISPLAY_NAME_MAPPINGS = _website_prompt_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
 # ---------------------------------------------------------------------------
 # Combined mappings for ComfyUI
 # ---------------------------------------------------------------------------
@@ -119,6 +131,8 @@ NODE_CLASS_MAPPINGS = {
     **VL_SCENE_NODE_CLASS_MAPPINGS,
     **VL_EXTRACT_NODE_CLASS_MAPPINGS,
     **PRESET_NODE_CLASS_MAPPINGS,
+    **WEB_IMAGE_NODE_CLASS_MAPPINGS,
+    **WEBSITE_PROMPT_NODE_CLASS_MAPPINGS,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -131,4 +145,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **VL_SCENE_DISPLAY_NAME_MAPPINGS,
     **VL_EXTRACT_DISPLAY_NAME_MAPPINGS,
     **PRESET_NODE_DISPLAY_NAME_MAPPINGS,
+    **WEB_IMAGE_NODE_DISPLAY_NAME_MAPPINGS,
+    **WEBSITE_PROMPT_NODE_DISPLAY_NAME_MAPPINGS,
 }

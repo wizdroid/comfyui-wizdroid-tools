@@ -369,6 +369,9 @@ Shipped catalogs (filenames → nodes):
 | `accessories.json` | 🧙 Accessories |
 | `props.json` | 🧙 Props |
 | `weapons.json` | 🧙 Weapons |
+| `goth_sets.json` | 🧙 Complete Goth Set |
+| `characters.json` | 🧙 Character Set |
+| `anime_cosplay.json` | 🧙 Anime Cosplay Set |
 
 | Input | Type | Notes |
 |-------|------|--------|
@@ -380,6 +383,80 @@ Shipped catalogs (filenames → nodes):
 | `text` | STRING | Fragment, e.g. `combat boots, matte black leather` |
 
 See `data/presets/README.md` for schema and how to ship your own catalog.
+
+---
+
+### 9. Load Image from URL
+
+Category: `🧙 Wizdroid/Utils` — non-AI utility node.
+
+Downloads an image from a **web URL** and outputs a ComfyUI `IMAGE` + `MASK`
+pair with the same shape as the core `LoadImage` node, so it plugs straight
+into any existing workflow (img2img, ControlNet, VL image extract, …).
+
+Works with:
+
+- **Direct image links** — `https://i.pinimg.com/originals/.../photo.jpg`,
+  any `*.jpg/png/webp/gif` URL.
+- **Web pages** — paste a Pinterest pin page
+  (`https://www.pinterest.com/pin/12345/`) and it auto-extracts the page's
+  `og:image` meta tag (works for most sites with social previews).
+
+Pinterest / hotlink-protected sites: pass `https://www.pinterest.com/` (or
+the site root) as the **referer** to satisfy basic hotlink protection.
+Direct `*.pinimg.com` image URLs are the most reliable path.
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `url` | STRING | Image URL or page URL |
+| `referer` (opt) | STRING | HTTP Referer header for hotlink-protected sites |
+| `timeout` (opt) | INT | Seconds, default 30 |
+| `cache_to_disk` (opt) | BOOLEAN | Save a copy to the ComfyUI temp dir |
+
+| Output | Type | Meaning |
+|--------|------|---------|
+| `image` | IMAGE | RGB tensor, `[B, H, W, 3]` |
+| `mask` | MASK | Alpha-derived mask (`1 - alpha`), ones if no alpha |
+| `width` | INT | Image width |
+| `height` | INT | Image height |
+
+Note: this node downloads whatever URL you point it at — only use it with
+links you are allowed to use.
+
+---
+
+### 10. LLM Prompt from Website
+
+Category: `🧙 Wizdroid/LLM`
+
+Fetch a web page that describes a **character** (bio, lore page, wiki,
+character sheet, …), extract its readable text, and let Ollama turn that
+into a detailed **image prompt** for the character — using the same
+`spice` / `fantasy` / `detail` meta-prompts as the LLM Prompt Generator.
+
+Pipeline: `URL → page text (og:title / og:description + body) → Ollama →
+single-paragraph character image prompt`.
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `ollama_url` / `ollama_model` | STRING / dropdown | Ollama server + model |
+| `url` | STRING | Website URL describing the character |
+| `max_chars` | INT | Cap on extracted text sent to the LLM (default 4000) |
+| `spice` | INT 0–10 | SFW → explicit NSFW |
+| `fantasy` | INT 0–10 | Photoreal → pure fantasy |
+| `detail` | INT 0–10 | Minimal → hyper-detailed |
+| `temperature` | FLOAT | LLM sampling |
+| `max_tokens` | INT | Output budget |
+| `seed` (opt) | INT | 0 = random |
+| `referer` (opt) | STRING | HTTP Referer for protected sites |
+
+| Output | Type | Meaning |
+|--------|------|---------|
+| `prompt` | STRING | Generated character image prompt |
+| `website_text` | STRING | Extracted page text (debugging / reuse) |
+
+Tip: for JS-rendered pages (e.g. Pinterest's client UI) prefer a URL whose
+`og:description` is populated, since the body text may otherwise be empty.
 
 ---
 
@@ -395,8 +472,7 @@ data/
   scene/        # video scene mood/style + VL/text templates
   vl_extract/   # VL image extract modes + system templates
   lyrics/       # ACE-Step structures, choices, templates
-  rewrite/      # text rewriter modes + templates
-  presets/      # plugin-style preset catalogs (one JSON → one node)
+  rewrite/      # text rewriter modes + templates  website/     # website → character image prompt meta-prompts  presets/      # plugin-style preset catalogs (one JSON → one node)
 ```
 
 JSON is reloaded when mtime changes. Invalid JSON falls back to small
