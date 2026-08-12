@@ -154,10 +154,11 @@ Text-only scene package for AI **video** workflows (and a keyframe image prompt)
 | `seed` | INT optional | 0 = random |
 
 `video_model` options: `Generic (any video model)` (default), `MiniMax
-(Hailuo)`, `Hunyuan 3 (H3)`, `Wan 2.2`, `Grok Imagine 1.5`, `LTX 2.3`. Each
-uses its own system/user meta prompts tuned for that model; the generic option
-uses the shared templates. Add or tweak models in
-`data/scene/video_models.json` (page refresh re-reads the dropdown).
+(Hailuo)`, `MiniMax H3 (Hailuo 03)`, `Hunyuan 3 (H3)`, `Wan 2.2`,
+`Grok Imagine 1.5`, `LTX 2.3`. Each uses its own system/user meta prompts
+tuned for that model; the generic option uses the shared templates. Add or
+tweak models in `data/scene/video_models.json` (page refresh re-reads the
+dropdown).
 
 Outputs:
 

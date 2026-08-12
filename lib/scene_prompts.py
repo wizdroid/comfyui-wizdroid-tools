@@ -3,8 +3,8 @@
 Files:
   data/scene/choices.json       — mood, style dropdowns
   data/scene/system.json        — generic text + VL system/user templates
-  data/scene/video_models.json  — per-model meta prompts (MiniMax, Hunyuan 3,
-                                  Wan 2.2, Grok Imagine 1.5, LTX 2.3, …)
+  data/scene/video_models.json  — per-model meta prompts (MiniMax, MiniMax H3,
+                                  Hunyuan 3, Wan 2.2, Grok Imagine 1.5, LTX 2.3, …)
 """
 
 from __future__ import annotations

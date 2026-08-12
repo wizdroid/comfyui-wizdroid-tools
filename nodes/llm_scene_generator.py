@@ -55,7 +55,7 @@ class WizdroidLLMSceneGenerator:
                         "default": video_models[0] if video_models else "Generic (any video model)",
                         "tooltip": (
                             "Target video model. Selects model-specific meta prompts "
-                            "(MiniMax, Hunyuan 3, Wan 2.2, Grok Imagine 1.5, LTX 2.3) "
+                            "(MiniMax, MiniMax H3, Hunyuan 3, Wan 2.2, Grok Imagine 1.5, LTX 2.3) "
                             "or the generic prompt set. Edit data/scene/video_models.json."
                         ),
                     },
