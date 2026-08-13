@@ -376,8 +376,9 @@ Shipped catalogs (filenames → nodes):
 
 | Input | Type | Notes |
 |-------|------|--------|
-| `item` | dropdown | Catalog entry; `none` skips the type |
+| `item` | dropdown | Catalog entry; `none` / `random` / `increment` (same meaning as character dropdowns) |
 | `details` | STRING | Free-text extras (color, material, …) |
+| `seed` | INT 0..0xFFFFFFFF | Drives `random` and `increment` |
 
 | Output | Type | Meaning |
 |--------|------|---------|

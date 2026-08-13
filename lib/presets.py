@@ -19,11 +19,15 @@ Schema (per file)::
 
 Filenames (without ``.json``) become stable node ids (e.g. ``footwear`` →
 ``WizdroidPresetFootwear``).
+
+Dropdowns always include ``random`` and ``increment`` (resolved at execute
+time from the node's ``seed``). ``none`` is prepended when ``include_none``.
 """
 
 from __future__ import annotations
 
 import logging
+import random
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -34,8 +38,16 @@ logger = logging.getLogger(__name__)
 
 PRESETS_DIR = DATA_DIR / "presets"
 
-# Special dropdown token (not stored in JSON items)
+# Special dropdown tokens (not stored in JSON items)
 NONE_OPTION = "none"
+RANDOM_OPTION = "random"
+INCREMENT_OPTION = "increment"
+SPECIAL_OPTIONS: tuple[str, ...] = (NONE_OPTION, RANDOM_OPTION, INCREMENT_OPTION)
+_SPECIAL_SET = frozenset(SPECIAL_OPTIONS)
+
+
+def _is_special(text: str) -> bool:
+    return (text or "").strip().lower() in _SPECIAL_SET
 
 _OUTPUT_STYLES = frozenset(
     {
@@ -100,14 +112,14 @@ def load_preset_file(path: Path) -> Dict[str, Any]:
         for entry in items_raw:
             if isinstance(entry, str):
                 text = entry.strip()
-                if text and text.lower() != NONE_OPTION:
+                if text and not _is_special(text):
                     items.append(text)
             elif isinstance(entry, dict):
                 # Allow {"label": "…"} or {"id": "…", "label": "…"}
                 label = entry.get("label") or entry.get("id") or entry.get("name")
                 if isinstance(label, str) and label.strip():
                     text = label.strip()
-                    if text.lower() != NONE_OPTION:
+                    if not _is_special(text):
                         items.append(text)
     if not items:
         items = list(_FALLBACK_ITEMS.get(slug, ["example item"]))
@@ -179,20 +191,69 @@ def get_preset(preset_id: str) -> Optional[Dict[str, Any]]:
 
 
 def get_dropdown_choices(preset: Dict[str, Any]) -> List[str]:
-    """Build the ComfyUI dropdown list for a preset (optionally with ``none``)."""
+    """Build the ComfyUI dropdown list for a preset.
+
+    Always prepends ``random`` and ``increment``. Prepends ``none`` when
+    ``include_none`` is true (the default).
+    """
     items: Sequence[str] = preset.get("items") or []
-    # Deduplicate while preserving order
+    # Deduplicate while preserving order; drop special tokens if they leaked in
     seen: set[str] = set()
     ordered: List[str] = []
     for item in items:
         key = item.lower()
-        if key in seen:
+        if key in seen or key in _SPECIAL_SET:
             continue
         seen.add(key)
         ordered.append(item)
+    specials: List[str] = []
     if preset.get("include_none", True):
-        return [NONE_OPTION, *ordered]
-    return ordered if ordered else [NONE_OPTION]
+        specials.append(NONE_OPTION)
+    specials.extend([RANDOM_OPTION, INCREMENT_OPTION])
+    if not ordered:
+        return specials or [NONE_OPTION]
+    return [*specials, *ordered]
+
+
+def default_dropdown_choice(choices: Sequence[str]) -> str:
+    """Prefer ``none`` so unused accessory nodes stay silent."""
+    for choice in choices:
+        if choice.strip().lower() == NONE_OPTION:
+            return choice
+    concrete = [c for c in choices if not _is_special(c)]
+    if concrete:
+        return concrete[0]
+    return choices[0] if choices else NONE_OPTION
+
+
+def resolve_preset_item(
+    item: str,
+    items: Sequence[str],
+    seed: int = 0,
+) -> Optional[str]:
+    """Resolve a dropdown value to a concrete catalog item, or None to omit.
+
+    - concrete value → returned as-is
+    - ``none`` / empty → None
+    - ``random`` → uniform pick via ``Random(seed)``
+    - ``increment`` → ``items[seed % len(items)]``
+    """
+    raw = (item or "").strip()
+    if not raw or raw.lower() == NONE_OPTION:
+        return None
+
+    concrete = [c for c in items if not _is_special(c)]
+    if not concrete:
+        return None
+
+    seed = int(seed) & 0xFFFFFFFF
+
+    if raw.lower() == RANDOM_OPTION:
+        return random.Random(seed).choice(concrete)
+    if raw.lower() == INCREMENT_OPTION:
+        return concrete[seed % len(concrete)]
+
+    return raw
 
 
 def format_preset_fragment(
@@ -210,7 +271,8 @@ def format_preset_fragment(
     # Collapse internal whitespace in details
     details_clean = re.sub(r"\s+", " ", details_clean)
 
-    is_none = not item_clean or item_clean.lower() == NONE_OPTION
+    # Unresolved special tokens (none / random / increment) skip the item
+    is_none = not item_clean or _is_special(item_clean)
 
     if is_none and not details_clean:
         return ""

@@ -7,16 +7,18 @@ Category: ``🧙 Wizdroid/Presets``.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Tuple, Type
+from typing import Any, Dict, List, Tuple, Type
 
 from lib.presets import (
     NONE_OPTION,
     class_name_for_preset,
+    default_dropdown_choice,
     discover_presets,
     display_name_for_preset,
     format_preset_fragment,
     get_dropdown_choices,
     get_preset,
+    resolve_preset_item,
 )
 
 logger = logging.getLogger(__name__)
@@ -62,10 +64,12 @@ def _make_preset_node_class(preset_id: str, label: str, description: str) -> Typ
                     "item": (
                         choices,
                         {
-                            "default": choices[0] if choices else NONE_OPTION,
+                            "default": default_dropdown_choice(choices),
                             "tooltip": (
                                 f"{label} type from data/presets/{preset_id}.json. "
-                                f"Choose '{NONE_OPTION}' to skip (details alone still emit)."
+                                f"'{NONE_OPTION}' skips the type (details alone still emit). "
+                                "'random' picks uniformly from the catalog. "
+                                "'increment' walks the catalog as seed changes."
                             ),
                         },
                     ),
@@ -77,16 +81,36 @@ def _make_preset_node_class(preset_id: str, label: str, description: str) -> Typ
                             "tooltip": details_tooltip,
                         },
                     ),
+                    "seed": (
+                        "INT",
+                        {
+                            "default": 0,
+                            "min": 0,
+                            "max": 0xFFFFFFFF,
+                            "tooltip": (
+                                "Drives 'random' and 'increment'. Same seed + same "
+                                "catalog → same item (deterministic)."
+                            ),
+                        },
+                    ),
                 },
             }
 
-        def build(self, item: str = NONE_OPTION, details: str = "") -> Tuple[str]:
+        def build(
+            self,
+            item: str = NONE_OPTION,
+            details: str = "",
+            seed: int = 0,
+        ) -> Tuple[str]:
             preset = get_preset(preset_id)
             style = "item_then_details"
+            catalog: List[str] = []
             if preset is not None:
                 style = preset.get("output_style") or style
+                catalog = list(preset.get("items") or [])
+            resolved = resolve_preset_item(item, catalog, seed)
             fragment = format_preset_fragment(
-                item, details, output_style=style
+                resolved or NONE_OPTION, details, output_style=style
             )
             return (fragment,)
 

@@ -34,7 +34,7 @@ Files starting with `_` are ignored (handy for drafts).
 | `description` | no | Node DESCRIPTION text |
 | `details_tooltip` | no | Tooltip on the free-text field |
 | `details_label` | no | Reserved / docs only (UI always uses `details`) |
-| `include_none` | no | Prepend `none` to the dropdown (default true) |
+| `include_none` | no | Prepend `none` to the dropdown (default true). `random` and `increment` are always added. |
 | `output_style` | no | How item + details are joined (see below) |
 | `items` | yes | List of strings (or `{"label": "…"}` objects) |
 
@@ -46,6 +46,17 @@ Files starting with `_` are ignored (handy for drafts).
 | `details_then_item` | `matte black leather combat boots` |
 | `item_only` | `combat boots` |
 | `details_only` | `matte black leather` (falls back to item if empty) |
+
+Every dropdown also includes two special values (not stored in JSON `items`):
+
+| Value | Meaning |
+|-------|---------|
+| `none` | Skip the catalog type (details alone still emit) |
+| `random` | Uniform pick from `items`; driven by `seed` |
+| `increment` | `items[seed % len(items)]` — walks the catalog as seed changes |
+
+Same seed + same catalog always resolve the same way. Default selection is
+`none` so unused accessory nodes stay silent.
 
 If `item` is `none` and details are empty → empty string.  
 If `item` is `none` but details are set → details only.
