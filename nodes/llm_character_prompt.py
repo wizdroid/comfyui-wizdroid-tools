@@ -39,7 +39,8 @@ def _dropdown(field: str, tooltip: str = "") -> tuple:
 class WizdroidCharacterPrompt:
     """Compose a character and emit a single image-generation prompt string.
 
-    - **AI mode** (`use_ai=True`): Ollama expands a structured character JSON.
+    - **AI mode** (`use_ai=True`): Ollama expands a structured character JSON
+      into a nine-layer cinematic portrait prompt.
     - **Template mode** (`use_ai=False`): concatenates selections into prose.
     """
 
@@ -49,8 +50,8 @@ class WizdroidCharacterPrompt:
     FUNCTION = "generate"
     OUTPUT_NODE = False
     DESCRIPTION = (
-        "Build a character via dropdowns & text fields, then generate an image "
-        "prompt via Ollama or a plain template."
+        "Build a character via dropdowns & text fields, then generate a cinematic "
+        "portrait prompt via Ollama or a plain template."
     )
 
     @classmethod
@@ -106,14 +107,14 @@ class WizdroidCharacterPrompt:
                 "max_tokens": (
                     "INT",
                     {
-                        "default": 512,
+                        "default": 1024,
                         "min": 64,
-                        "max": 2048,
+                        "max": 4096,
                         "step": 32,
                         "tooltip": (
-                            "Maximum output tokens for AI-generated prompt. "
-                            "Higher values allow the comprehensive character "
-                            "expansion (face micro-detail, fabric, lighting, etc.)."
+                            "Maximum output tokens for the cinematic portrait prompt. "
+                            "Default 1024 fits the nine-layer expansion (style, outfit, "
+                            "lighting, film language). Raise for even denser prose."
                         ),
                     },
                 ),
@@ -292,7 +293,7 @@ class WizdroidCharacterPrompt:
         use_ai: bool = True,
         seed: int = 0,
         temperature: float = 0.7,
-        max_tokens: int = 512,
+        max_tokens: int = 1024,
         spice: int = 0,
         fantasy: int = 0,
         detail: int = 5,
@@ -333,7 +334,7 @@ class WizdroidCharacterPrompt:
         spice = max(0, min(10, int(spice)))
         fantasy = max(0, min(10, int(fantasy)))
         detail = max(0, min(10, int(detail)))
-        max_tokens = max(64, min(2048, int(max_tokens)))
+        max_tokens = max(64, min(4096, int(max_tokens)))
 
         selections = {
             "gender": gender,

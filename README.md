@@ -72,7 +72,9 @@ Build a character from dropdowns and free text, then emit one prompt.
 
 Two modes:
 
-- `use_ai=True` -- send a character JSON to Ollama (spice/fantasy/detail apply)
+- `use_ai=True` -- send a character JSON to Ollama, which expands it into a
+  long cinematic portrait prompt (style anchor, materials, lighting, film
+  language, quality + negatives). Spice / fantasy / detail still apply.
 - `use_ai=False` -- concatenate resolved fields into plain English (no LLM)
 
 If Ollama fails in AI mode, the node falls back to the template string and
@@ -101,7 +103,7 @@ Global inputs:
 | `use_ai` | BOOLEAN | AI vs template (default True) |
 | `seed` | INT 0..0xFFFFFFFF | Drives random/increment |
 | `temperature` | FLOAT 0-2 | AI mode only |
-| `max_tokens` | INT 64-2048 | AI mode only (default 512 for rich expansion) |
+| `max_tokens` | INT 64-4096 | AI mode only (default 1024 for the nine-layer portrait) |
 | `spice` / `fantasy` / `detail` | INT 0-10 | AI mode only |
 
 Character fields (dropdown unless noted):

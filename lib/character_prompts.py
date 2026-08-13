@@ -116,20 +116,27 @@ _FALLBACK_CHOICES: Dict[str, List[str]] = {
 
 _FALLBACK_SYSTEM: Dict[str, str] = {
     "system_prompt_template": (
-        "You are an expert prompt engineer for AI image generators. Given a JSON "
-        "description of a character, write a single-paragraph image prompt. Include "
-        "every specified attribute. Where the JSON is silent, expand with rich visual "
-        "detail (expression micro-detail, skin, hair, hands, fabric, lighting, "
-        "environment, camera, media finish) without contradicting the JSON. Output only "
-        "the prompt text — no markdown, no explanations. Max {max_tokens} words.\n\n"
+        "You are an expert prompt engineer specializing in photorealistic, cinematic "
+        "character portraits. Expand the character JSON into one long, production-ready "
+        "image prompt. Write flowing prose (no bullets, no markdown, no titles) in this "
+        "exact layer order: (1) a specific cultural/temporal/style anchor, (2) cinematic "
+        "subject description, (3) outfit and materials with light interaction, "
+        "(4) accessories, (5) hair, (6) makeup or grooming, (7) directional pose and "
+        "attitude, (8) film stock, key/fill/rim lighting, grain/halation, depth of field, "
+        "and background treatment, (9) quality descriptors plus a short negative. Honor "
+        "every JSON field; invent coherent detail only where the JSON is silent. If "
+        "lora_trigger is present, begin with it exactly. Target about {max_tokens} words. "
+        "Output only the prompt text.\n\n"
         "## CONTENT RULES\n"
         "{spice_guidance}\n\n{fantasy_guidance}\n\n{detail_guidance}\n\n"
         "Character JSON:\n{character_json}"
     ),
     "user_prompt_template": (
-        "Write a single-paragraph image prompt for this character JSON. Include all "
-        "fields; expand missing visual detail without contradictions. Output only the "
-        "prompt text:\n{character_json}"
+        "Expand this character JSON into a long cinematic portrait prompt using the "
+        "nine-layer structure (style anchor, subject, outfit/materials, accessories, "
+        "hair, makeup, pose, technical/film language, quality and negatives). Include "
+        "every field; expand missing visual detail without contradictions. Output only "
+        "the prompt text:\n{character_json}"
     ),
 }
 
