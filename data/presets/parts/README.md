@@ -1,7 +1,8 @@
 # `parts/` — Shared (unisex) part catalogs
 
 Part-based, gender-neutral pickers (same schema as before: `label`, `items`,
-`output_style`, …). The category shown in the **🧙 Preset** node is `parts`.
+`output_style`, …). Each catalog here becomes its own node under
+`🧙 Wizdroid/Presets/Parts`.
 
 Present catalogs:
 
@@ -11,4 +12,5 @@ Present catalogs:
   `makeup.json`, `nails.json`, `neckwear.json`, `outerwear.json`,
   `piercings.json`, `props.json`, `tattoos.json`, `tops.json`, `weapons.json`
 
-Add new part catalogs here and refresh the ComfyUI page.
+Add new part catalogs here, then restart ComfyUI (edits to existing `items`
+only need a page refresh).

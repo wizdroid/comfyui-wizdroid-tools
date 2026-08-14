@@ -117,10 +117,10 @@ Spice/detail for NSFW density still come from `prompts/spice.json` and
 
 ## Add a Preset catalog
 
-Catalogs are JSON files browsed by a single **🧙 Preset** node under
-`🧙 Wizdroid/Presets` (Category → Catalog → Item → Details). Drop a file into
-a category folder (`parts/`, `sets/female/`, `sets/male/`, `sets/unisex/`,
-or the root = `unfiled`):
+Each catalog JSON becomes its own **plugin-style** node. Drop a file into a
+category folder (`parts/`, `sets/female/`, `sets/male/`, `sets/unisex/`, or
+the root = `unfiled`); the folder decides the node's submenu under
+`🧙 Wizdroid/Presets` (e.g. `parts/foo.json` → `…/Presets/Parts → 🧙 Foo`):
 
 ```json
 {
@@ -132,8 +132,8 @@ or the root = `unfiled`):
 }
 ```
 
-Refresh the ComfyUI page to pick it up in the **🧙 Preset** node; a brand-new
-*category folder* needs one restart to appear in the category dropdown.
+**Restart ComfyUI** to register a new catalog as a node; editing an existing
+catalog's `items` only needs a browser page refresh.
 See `presets/README.md` for the full schema, `output_style`, and layout.
 
 ## Notes
@@ -141,4 +141,4 @@ See `presets/README.md` for the full schema, `output_style`, and layout.
 - Keys under rewrite `modes.json` are the ComfyUI dropdown values (stable ids).
 - Use `\n` in JSON strings for multi-line instructions.
 - Invalid JSON falls back to built-in minimal defaults and is logged.
-- Preset catalogs hot-reload on page refresh; a **new category folder** needs one ComfyUI restart to appear in the `category` dropdown.
+- New preset catalog files need a ComfyUI **restart** (node classes are built at import); editing an existing catalog's `items` hot-reloads on page refresh.

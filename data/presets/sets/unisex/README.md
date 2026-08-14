@@ -1,6 +1,6 @@
 # `sets/unisex/` — Gender-neutral complete-look sets
 
-Catalogs here appear under category `sets/unisex` in the **🧙 Preset** node.
+Each catalog here becomes its own node under `🧙 Wizdroid/Presets/Sets/Unisex`.
 
 Present catalogs (cover both male and female characters):
 

@@ -1,7 +1,8 @@
-"""Preset catalogs for the universal preset picker under data/presets/.
+"""Preset catalogs for plugin-style preset nodes under data/presets/.
 
-One ComfyUI node (``WizdroidPresetPicker``) browses every catalog via
-cascading dropdowns: Category → Catalog → Item (+ free-text details + seed).
+``nodes/preset_nodes.py`` generates one ComfyUI node per catalog JSON; each
+node's category is derived from its folder path. This module discovers,
+loads, and formats those catalogs (schema + helpers live here).
 
 A catalog is a ``*.json`` file. Its *category* is the folder path relative to
 ``data/presets/``; files at the root are the ``unfiled`` category until they
@@ -60,7 +61,7 @@ _SPECIAL_SET = frozenset(SPECIAL_OPTIONS)
 # Category label for legacy files sitting directly in data/presets/.
 LEGACY_CATEGORY = "unfiled"
 
-# Preferred order of the category dropdown; unknown categories sort last.
+# Preferred category order for discovery/registration; unknown categories sort last.
 _CATEGORY_ORDER: tuple[str, ...] = (
     "parts",
     "sets/female",
@@ -412,8 +413,11 @@ def format_preset_fragment(
 
 
 def class_name_for_preset(preset_id: str) -> str:
-    """Stable ComfyUI class name, e.g. footwear → WizdroidPresetFootwear."""
-    parts = re.split(r"[_\-\s]+", preset_id.strip())
+    """Stable ComfyUI class name for a preset id (``category:slug``).
+
+    e.g. ``sets/unisex:anime_cosplay`` → ``WizdroidPresetSetsUnisexAnimeCosplay``.
+    """
+    parts = re.split(r"[_\-\s/:]+", preset_id.strip())
     camel = "".join(p[:1].upper() + p[1:] for p in parts if p)
     if not camel:
         camel = "Generic"
@@ -425,3 +429,20 @@ def class_name_for_preset(preset_id: str) -> str:
 
 def display_name_for_preset(label: str) -> str:
     return f"🧙 {label}"
+
+
+# ComfyUI menu root for preset nodes; submenus mirror the folder layout.
+PRESET_CATEGORY_ROOT = "🧙 Wizdroid/Presets"
+
+
+def ui_category_for(preset: Dict[str, Any]) -> str:
+    """Map a preset's folder category to a ComfyUI menu category.
+
+    Root / ``unfiled`` files land directly under the preset root; deeper
+    folders become submenus (``sets/female`` → ``…/Presets/Sets/Female``).
+    """
+    category = (preset.get("category") or LEGACY_CATEGORY).strip("/")
+    if not category or category == LEGACY_CATEGORY:
+        return PRESET_CATEGORY_ROOT
+    parts = [p for p in category.split("/") if p]
+    return f"{PRESET_CATEGORY_ROOT}/{'/'.join(p.title() for p in parts)}"

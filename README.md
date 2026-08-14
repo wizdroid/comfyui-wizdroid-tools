@@ -346,44 +346,58 @@ Data: `data/rewrite/modes.json`, `system.json`.
 
 ### 8. Presets (plugin-style)
 
-Category: `🧙 Wizdroid/Presets`
-
 Simple non-AI nodes: one **dropdown** of catalog items + one **details**
-text field (color, material, placement, …). Output is a single prompt
-fragment string.
+text field (color, material, placement, …) + a `seed`. Output is a single
+prompt fragment string.
 
-Nodes are **generated from JSON**. Each file under `data/presets/*.json`
-becomes one node. Drop in a new file, restart ComfyUI — no Python edits.
-That is the plugin behaviour.
+Nodes are **generated from JSON**. Each file under `data/presets/` becomes
+its own node, and the folder it lives in decides which submenu it appears
+under. Drop in a new file, restart ComfyUI — no Python edits. That is the
+plugin behaviour.
 
-Shipped catalogs (filenames → nodes):
+| Folder | Node category |
+|--------|---------------|
+| `parts/` | `🧙 Wizdroid/Presets/Parts` |
+| `sets/female/` | `🧙 Wizdroid/Presets/Sets/Female` |
+| `sets/male/` | `🧙 Wizdroid/Presets/Sets/Male` |
+| `sets/unisex/` | `🧙 Wizdroid/Presets/Sets/Unisex` |
+| root (`*.json`) | `🧙 Wizdroid/Presets` |
 
-| File | Node |
-|------|------|
-| `footwear.json` | 🧙 Footwear |
-| `headgear.json` | 🧙 Headgear |
-| `hairstyle_extras.json` | 🧙 Hairstyle Extras |
-| `expressions.json` | 🧙 Expressions |
-| `makeup.json` | 🧙 Makeup |
-| `eyewear.json` | 🧙 Eyewear |
-| `jewelry.json` | 🧙 Jewelry |
-| `piercings.json` | 🧙 Piercings |
-| `tattoos.json` | 🧙 Tattoos |
-| `body_markings.json` | 🧙 Body Markings |
-| `gloves.json` | 🧙 Gloves |
-| `nails.json` | 🧙 Nails |
-| `neckwear.json` | 🧙 Neckwear |
-| `tops.json` | 🧙 Tops |
-| `bottoms.json` | 🧙 Bottoms |
-| `outerwear.json` | 🧙 Outerwear |
-| `hosiery.json` | 🧙 Hosiery |
-| `bags.json` | 🧙 Bags |
-| `accessories.json` | 🧙 Accessories |
-| `props.json` | 🧙 Props |
-| `weapons.json` | 🧙 Weapons |
-| `goth_sets.json` | 🧙 Complete Goth Set |
-| `characters.json` | 🧙 Character Set |
-| `anime_cosplay.json` | 🧙 Anime Cosplay Set |
+Shipped catalogs (file → node):
+
+| Category | File | Node |
+|----------|------|------|
+| parts | `footwear.json` | 🧙 Footwear |
+| parts | `headgear.json` | 🧙 Headgear |
+| parts | `hairstyle_extras.json` | 🧙 Hairstyle Extras |
+| parts | `expressions.json` | 🧙 Expressions |
+| parts | `makeup.json` | 🧙 Makeup |
+| parts | `eyewear.json` | 🧙 Eyewear |
+| parts | `jewelry.json` | 🧙 Jewelry |
+| parts | `piercings.json` | 🧙 Piercings |
+| parts | `tattoos.json` | 🧙 Tattoos |
+| parts | `body_markings.json` | 🧙 Body Markings |
+| parts | `gloves.json` | 🧙 Gloves |
+| parts | `nails.json` | 🧙 Nails |
+| parts | `neckwear.json` | 🧙 Neckwear |
+| parts | `tops.json` | 🧙 Tops |
+| parts | `bottoms.json` | 🧙 Bottoms |
+| parts | `outerwear.json` | 🧙 Outerwear |
+| parts | `hosiery.json` | 🧙 Hosiery |
+| parts | `bags.json` | 🧙 Bags |
+| parts | `accessories.json` | 🧙 Accessories |
+| parts | `props.json` | 🧙 Props |
+| parts | `weapons.json` | 🧙 Weapons |
+| sets/female | `goth_sets.json` | 🧙 Complete Goth Set |
+| sets/female | `bollywood-80s.json` | 🧙 1980s Bollywood Disco Set |
+| sets/female | `candid_mini_dresses.json` | 🧙 Candid Mini Dress Set |
+| sets/female | `glamorous_bodycon_dresses.json` | 🧙 Glamorous Bodycon Dress Set |
+| sets/female | `indian_casual_everyday.json` | 🧙 Indian Casual Everyday Set |
+| sets/female | `indian_chudidar_sets.json` | 🧙 Indian Chudidar Set |
+| sets/female | `indian_lehenga_sets.json` | 🧙 Indian Lehenga Set |
+| sets/female | `indian_sari_drapes.json` | 🧙 Indian Sari Drape Set |
+| sets/unisex | `characters.json` | 🧙 Character Set |
+| sets/unisex | `anime_cosplay.json` | 🧙 Anime Cosplay Set |
 
 | Input | Type | Notes |
 |-------|------|--------|

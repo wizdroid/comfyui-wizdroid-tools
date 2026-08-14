@@ -1,6 +1,6 @@
 # `sets/female/` — Female complete-look sets
 
-Catalogs here appear under category `sets/female` in the **🧙 Preset** node.
+Each catalog here becomes its own node under `🧙 Wizdroid/Presets/Sets/Female`.
 
 Present catalogs (all formatted as full cinematic prompts):
 

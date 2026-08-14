@@ -1,8 +1,19 @@
 # Preset catalogs
 
-One **🧙 Preset** node under **🧙 Wizdroid / Presets** browses every catalog in
-this folder via cascading dropdowns: **Category → Catalog → Item** (+ free-text
-`details` + `seed`).
+Each catalog JSON in this folder becomes its **own ComfyUI node**
+(plugin-style). The folder it lives in decides which submenu it appears
+under (root files go straight under `🧙 Wizdroid/Presets`):
+
+| Folder | Node category |
+|--------|---------------|
+| `parts/` | `🧙 Wizdroid/Presets/Parts` |
+| `sets/female/` | `🧙 Wizdroid/Presets/Sets/Female` |
+| `sets/male/` | `🧙 Wizdroid/Presets/Sets/Male` |
+| `sets/unisex/` | `🧙 Wizdroid/Presets/Sets/Unisex` |
+| root (`*.json`) | `🧙 Wizdroid/Presets` |
+
+Each node has an `item` dropdown (+ `none` / `random` / `increment`), a
+free-text `details` field, and a `seed`.
 
 Catalogs are JSON files, grouped into **categories** by folder:
 
@@ -21,9 +32,9 @@ the root load as category `unfiled` until you move them into a category
 folder — nothing breaks either way.
 
 Edit freely. Save, then **refresh the ComfyUI browser page** so dropdowns
-reload. Generation always uses the latest file contents (mtime-cached). New
-catalogs/folders are discovered on refresh; a restart is only needed if your
-ComfyUI caches node info aggressively.
+reload. Generation always uses the latest file contents (mtime-cached).
+**New catalogs** (new nodes) need a ComfyUI **restart** — node classes are
+built once at import time.
 
 Files and folders starting with `_` are ignored (handy for drafts).
 
@@ -84,21 +95,21 @@ If `item` is `none` but details are set → details only.
 
 1. Create `data/presets/<category>/my_thing.json` (or the root for
    `unfiled`) with the schema above.
-2. **Refresh the ComfyUI browser page** — the universal **🧙 Preset** node
-   picks it up under `Category → Catalog`.
-3. If you created a brand-new *category* folder, restart ComfyUI once so the
-   new category appears in the `category` dropdown.
+2. **Restart ComfyUI** — the new catalog becomes its own node under the
+   submenu matching its folder (`data/presets/parts/foo.json` →
+   `🧙 Wizdroid/Presets/Parts → 🧙 Foo`).
+3. Editing an *existing* catalog's `items` only needs a browser page refresh.
 
 ## Example: custom footwear entry
 
-Open `footwear.json` and append to `items`:
+Open `parts/footwear.json` and append to `items`:
 
 ```json
 "platform mary janes"
 ```
 
-Refresh the browser page; the new option appears in the **🧙 Preset** node's
-`item` dropdown (after selecting the catalog).
+Refresh the browser page; the new option appears in the **🧙 Footwear**
+node's `item` dropdown.
 
 ## Built-in catalogs
 
