@@ -229,5 +229,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WizdroidLLMSceneGenerator": "🧙 LLM Video Scene Generator",
+    "WizdroidLLMSceneGenerator": "🧙 Video Scene Generator (Text)",
 }

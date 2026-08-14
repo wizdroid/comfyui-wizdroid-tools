@@ -214,5 +214,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WizdroidLLMPromptGenerator": "🧙 LLM Prompt Generator",
+    "WizdroidLLMPromptGenerator": "🧙 Prompt Generator",
 }

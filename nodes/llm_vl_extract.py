@@ -5,7 +5,7 @@ what to pull out (full reverse prompt, outfit flatlay, makeup, etc.).
 Spice 0–10 controls SFW → explicit NSFW description of content present in
 the image.
 
-Category: 🧙 Wizdroid/LLM
+Category: 🧙 Wizdroid/VL
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ class WizdroidVLExtract:
     Requires a vision-capable model (llava, qwen2.5-vl, gemma3, minicpm-v, …).
     """
 
-    CATEGORY = "🧙 Wizdroid/LLM"
+    CATEGORY = "🧙 Wizdroid/VL"
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("text", "raw")
     FUNCTION = "extract"
@@ -263,5 +263,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WizdroidVLExtract": "🧙 VL Image Extract",
+    "WizdroidVLExtract": "🧙 Image Extract",
 }

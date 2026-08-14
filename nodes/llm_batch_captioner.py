@@ -5,7 +5,7 @@ Point at a folder of images; a vision-language Ollama model writes a caption
 (booru tags, natural sentence, detailed, short) from
 ``data/batch_caption/modes.json``.
 
-Category: 🧙 Wizdroid/LLM
+Category: 🧙 Wizdroid/VL
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ _IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
 class WizdroidBatchCaptioner:
     """Caption every image in a folder and write <name>.txt files."""
 
-    CATEGORY = "🧙 Wizdroid/LLM"
+    CATEGORY = "🧙 Wizdroid/VL"
     RETURN_TYPES = ("STRING", "STRING", "INT", "INT")
     RETURN_NAMES = ("report", "last_caption", "processed", "failed")
     FUNCTION = "caption_folder"

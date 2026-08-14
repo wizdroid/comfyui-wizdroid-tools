@@ -34,7 +34,7 @@ Default Ollama URL: `http://localhost:11434`.
 
 ## Nodes
 
-### 1. LLM Prompt Generator
+### 1. Prompt Generator
 
 Class: `WizdroidLLMPromptGenerator`
 
@@ -137,7 +137,7 @@ Data:
 
 ---
 
-### 3. LLM Video Scene Generator
+### 3. Video Scene Generator (Text)
 
 Class: `WizdroidLLMSceneGenerator`
 
@@ -175,9 +175,11 @@ Data: `data/scene/choices.json`, `system.json`, `video_models.json`.
 
 ---
 
-### 4. VL Video Scene Generator
+### 4. Video Scene Generator (Image)
 
 Class: `WizdroidVLSceneGenerator`
+
+Category: `🧙 Wizdroid/VL`
 
 Vision-language scene package: **source image + user direction** → timed scene,
 dialogue, and a refined keyframe prompt. Use a VL Ollama model
@@ -196,17 +198,19 @@ dialogue, and a refined keyframe prompt. Use a VL Ollama model
 | `seed` | INT optional | 0 = random |
 | `max_image_side` | INT optional | Downscale longest side before VL (default 1280) |
 
-Same `video_model` options as the LLM Video Scene Generator (generic +
+Same `video_model` options as the Video Scene Generator (Text) (generic +
 per-model meta prompts from `data/scene/video_models.json`).
 
-Outputs: same as LLM Video Scene Generator (`scene_prompt`, `dialogue`,
+Outputs: same as Video Scene Generator (Text) (`scene_prompt`, `dialogue`,
 `image_prompt`, `raw`).
 
 ---
 
-### 5. VL Image Extract
+### 5. Image Extract
 
 Class: `WizdroidVLExtract`
+
+Category: `🧙 Wizdroid/VL`
 
 Vision-language **extract** from a source image: reverse prompt, outfit
 flatlay, makeup, wardrobe breakdown, and more. Use a VL Ollama model
@@ -258,7 +262,7 @@ Data: `data/vl_extract/modes.json`, `system.json`; spice/detail from
 
 ---
 
-### 6. LLM Lyrics Generator
+### 6. Lyrics Generator
 
 Class: `WizdroidLLMLyricsGenerator`
 
@@ -296,7 +300,7 @@ Data: `data/lyrics/structures.json`, `choices.json`, `system.json`.
 
 ---
 
-### 7. LLM Text Rewriter
+### 7. Text Rewriter
 
 Class: `WizdroidLLMTextRewriter`
 
@@ -429,14 +433,14 @@ links you are allowed to use.
 
 ---
 
-### 10. LLM Prompt from Website
+### 10. Prompt from Website
 
 Category: `🧙 Wizdroid/LLM`
 
 Fetch a web page that describes a **character** (bio, lore page, wiki,
 character sheet, …), extract its readable text, and let Ollama turn that
 into a detailed **image prompt** for the character — using the same
-`spice` / `fantasy` / `detail` meta-prompts as the LLM Prompt Generator.
+`spice` / `fantasy` / `detail` meta-prompts as the Prompt Generator.
 
 Pipeline: `URL → page text (og:title / og:description + body) → Ollama →
 single-paragraph character image prompt`.
@@ -466,7 +470,7 @@ Tip: for JS-rendered pages (e.g. Pinterest's client UI) prefer a URL whose
 
 ### 11. Batch Image Captioner (LoRA dataset prep)
 
-Category: `🧙 Wizdroid/LLM`
+Category: `🧙 Wizdroid/VL`
 
 Point at a **folder of images**; a vision-language model writes a
 `<name>.txt` caption next to each image — exactly what you need to build a
@@ -496,7 +500,7 @@ training set for LoRA/dreambooth. Skips images that already have a caption
 
 ### 12. Image Critique
 
-Category: `🧙 Wizdroid/LLM`
+Category: `🧙 Wizdroid/VL`
 
 Feed a generated **IMAGE** + the **prompt** that made it; a VL model critiques
 it and writes a **revised, improved prompt**. Focus dropdown (general, anatomy,

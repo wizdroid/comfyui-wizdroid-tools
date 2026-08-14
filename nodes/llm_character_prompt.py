@@ -446,5 +446,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WizdroidCharacterPrompt": "🧙 LLM Character Prompt Generator",
+    "WizdroidCharacterPrompt": "🧙 Character Prompt Generator",
 }

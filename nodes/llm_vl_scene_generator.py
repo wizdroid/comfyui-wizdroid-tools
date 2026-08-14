@@ -1,7 +1,7 @@
 """Wizdroid Tools — VL Video Scene Generator (image + text → scene + dialogue).
 
 Vision-language scene package grounded in a ComfyUI source IMAGE.
-Category: 🧙 Wizdroid/LLM
+Category: 🧙 Wizdroid/VL
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ class WizdroidVLSceneGenerator:
     image prompt faithful to the source frame.
     """
 
-    CATEGORY = "🧙 Wizdroid/LLM"
+    CATEGORY = "🧙 Wizdroid/VL"
     RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
     RETURN_NAMES = ("scene_prompt", "dialogue", "image_prompt", "raw")
     FUNCTION = "generate"
@@ -257,5 +257,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WizdroidVLSceneGenerator": "🧙 VL Video Scene Generator",
+    "WizdroidVLSceneGenerator": "🧙 Video Scene Generator (Image)",
 }

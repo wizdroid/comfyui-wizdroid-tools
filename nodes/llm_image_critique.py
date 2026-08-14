@@ -4,7 +4,7 @@ Feed a generated IMAGE + the prompt that made it; a VL model critiques it
 and writes a revised, improved prompt. Focus dropdown (general, anatomy,
 composition, lighting, style fidelity) from ``data/critique/modes.json``.
 
-Category: 🧙 Wizdroid/LLM
+Category: 🧙 Wizdroid/VL
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 class WizdroidImageCritique:
     """Critique a generated image and produce a revised prompt."""
 
-    CATEGORY = "🧙 Wizdroid/LLM"
+    CATEGORY = "🧙 Wizdroid/VL"
     RETURN_TYPES = ("STRING", "STRING", "STRING")
     RETURN_NAMES = ("critique", "revised_prompt", "raw")
     FUNCTION = "critique"

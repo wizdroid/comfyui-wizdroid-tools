@@ -250,5 +250,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WizdroidLLMWebsitePrompt": "🧙 LLM Prompt from Website",
+    "WizdroidLLMWebsitePrompt": "🧙 Prompt from Website",
 }
