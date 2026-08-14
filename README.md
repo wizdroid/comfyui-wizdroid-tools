@@ -10,6 +10,11 @@ Most of this tree was generated with DeepSeek R4 and Grok 4.5.
 It is AI slop. Read the code before you ship it. Do not file bugs about
 "vibes". If something is wrong, the code is wrong -- fix it or ignore it.
 
+**This is work in progress.** Nodes can break at any time. If a node
+malfunctions or shows stale inputs after an update, refresh your nodes in
+ComfyUI (click the "Refresh" button on the node graph / press `R`, or
+restart ComfyUI) before reporting an issue.
+
 ## Requirements
 
 - ComfyUI

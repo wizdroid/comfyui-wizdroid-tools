@@ -128,14 +128,27 @@ def _extract_message_content(msg: Any) -> str:
     return (content or "").strip()
 
 
+def _extract_thinking(data: Dict[str, Any]) -> str:
+    """Pull thinking text from a generate/chat payload."""
+    thinking = (data.get("thinking") or "").strip()
+    if thinking:
+        return thinking
+    msg = data.get("message")
+    if isinstance(msg, dict):
+        return (msg.get("thinking") or "").strip()
+    return ""
+
+
 def _extract_generate_text(data: Dict[str, Any], raw_text: str) -> str:
     """Pull response text from an Ollama generate/chat-shaped payload.
 
     Checks ``message.content`` (string or list of parts) then ``response``.
     It deliberately does NOT fall back to the raw JSON, so callers never see
-    the raw payload (which previously polluted caption/output files), and it
-    does NOT return the ``thinking`` trace — that lets the ``length`` retry in
-    :func:`generate_text` give the model a bigger budget to finish a real answer.
+    the raw payload (which previously polluted caption/output files).
+    ``thinking`` is used only when generation finished with an empty
+    response — qwen3-vl-thinking (and similar) can park the whole answer
+    there when think is disabled. A ``length`` stop is left empty so
+    :func:`generate_text` can retry with a bigger budget.
     """
     out = _extract_message_content(data.get("message"))
     if out:
@@ -143,6 +156,8 @@ def _extract_generate_text(data: Dict[str, Any], raw_text: str) -> str:
     out = (data.get("response") or "").strip()
     if out:
         return out
+    if (data.get("done_reason") or "").lower() != "length":
+        return _extract_thinking(data)
     return ""
 
 
@@ -184,6 +199,10 @@ def generate_text(
         "system": system,
         "options": opts,
     }
+    if _is_thinking_model(model):
+        # Ollama 0.12+ honors top-level `think`; options.think is also set
+        # in _build_generate_options so older servers still disable it.
+        payload["think"] = False
     if images:
         # Ollama expects raw base64 strings (no data:image/... prefix)
         payload["images"] = [img for img in images if img]
@@ -235,7 +254,11 @@ def generate_text(
         if out2:
             return True, out2
         done_reason = (data2.get("done_reason") or "").lower()
+        data = data2
 
+    leftover = _extract_thinking(data) if isinstance(data, dict) else ""
+    if leftover:
+        return True, leftover
     return False, "empty_response"
 
 
