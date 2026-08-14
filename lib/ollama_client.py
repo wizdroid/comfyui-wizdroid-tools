@@ -145,10 +145,8 @@ def _extract_generate_text(data: Dict[str, Any], raw_text: str) -> str:
     Checks ``message.content`` (string or list of parts) then ``response``.
     It deliberately does NOT fall back to the raw JSON, so callers never see
     the raw payload (which previously polluted caption/output files).
-    ``thinking`` is used only when generation finished with an empty
-    response — qwen3-vl-thinking (and similar) can park the whole answer
-    there when think is disabled. A ``length`` stop is left empty so
-    :func:`generate_text` can retry with a bigger budget.
+    If those fields are empty, use ``thinking`` — qwen3-vl-thinking (and
+    similar) can park the whole answer there.
     """
     out = _extract_message_content(data.get("message"))
     if out:
@@ -156,9 +154,7 @@ def _extract_generate_text(data: Dict[str, Any], raw_text: str) -> str:
     out = (data.get("response") or "").strip()
     if out:
         return out
-    if (data.get("done_reason") or "").lower() != "length":
-        return _extract_thinking(data)
-    return ""
+    return _extract_thinking(data)
 
 
 def generate_text(
@@ -192,22 +188,38 @@ def generate_text(
         model=model,
     )
 
-    payload: Dict[str, Any] = {
-        "model": model,
-        "stream": False,
-        "prompt": prompt,
-        "system": system,
-        "options": opts,
-    }
+    clean_images = [img for img in images if img] if images else []
+    if clean_images:
+        # /api/chat is the supported multimodal path (images + system + user).
+        messages: List[Dict[str, Any]] = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append(
+            {"role": "user", "content": prompt, "images": clean_images}
+        )
+        payload = {
+            "model": model,
+            "stream": False,
+            "messages": messages,
+            "options": opts,
+            # Unload immediately so ComfyUI can reclaim VRAM for sampling.
+            "keep_alive": 0,
+        }
+        api_url = f"{ollama_url.rstrip('/')}/api/chat"
+    else:
+        payload = {
+            "model": model,
+            "stream": False,
+            "prompt": prompt,
+            "system": system,
+            "options": opts,
+            "keep_alive": 0,
+        }
+        api_url = f"{ollama_url.rstrip('/')}/api/generate"
     if _is_thinking_model(model):
         # Ollama 0.12+ honors top-level `think`; options.think is also set
         # in _build_generate_options so older servers still disable it.
         payload["think"] = False
-    if images:
-        # Ollama expects raw base64 strings (no data:image/... prefix)
-        payload["images"] = [img for img in images if img]
-
-    api_url = f"{ollama_url.rstrip('/')}/api/generate"
 
     def _do_request(local_opts: Dict[str, Any]) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
         p = dict(payload)
