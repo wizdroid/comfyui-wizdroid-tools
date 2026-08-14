@@ -1,14 +1,27 @@
-"""Preset catalogs for simple dropdown+details nodes under data/presets/.
+"""Preset catalogs for the universal preset picker under data/presets/.
 
-Each ``*.json`` file in ``data/presets/`` becomes one ComfyUI node under
-``🧙 Wizdroid/Presets``. Edit or add JSON files, then refresh the ComfyUI
-browser page so dropdowns re-read choices.
+One ComfyUI node (``WizdroidPresetPicker``) browses every catalog via
+cascading dropdowns: Category → Catalog → Item (+ free-text details + seed).
+
+A catalog is a ``*.json`` file. Its *category* is the folder path relative to
+``data/presets/``; files at the root are the ``unfiled`` category until they
+are moved into a category folder. Suggested layout::
+
+    data/presets/
+    ├── parts/          # shared unisex part catalogs (tops, footwear, …)
+    │   ├── tops.json
+    │   └── footwear.json
+    ├── sets/
+    │   ├── female/     # female complete-look sets
+    │   ├── male/       # male complete-look sets
+    │   └── unisex/     # gender-neutral sets
+    └── legacy.json     # root files load as category "unfiled"
 
 Schema (per file)::
 
     {
-      "label": "Footwear",                 # node display name suffix
-      "description": "…",                  # node DESCRIPTION
+      "label": "Footwear",                 # catalog display name
+      "description": "…",                  # node DESCRIPTION for this catalog
       "details_tooltip": "…",              # free-text field tooltip
       "details_label": "details",          # optional; default "details"
       "sort_order": 10,                    # optional; lower first
@@ -17,11 +30,10 @@ Schema (per file)::
       "items": ["sneakers", "boots", …]
     }
 
-Filenames (without ``.json``) become stable node ids (e.g. ``footwear`` →
-``WizdroidPresetFootwear``).
-
-Dropdowns always include ``random`` and ``increment`` (resolved at execute
-time from the node's ``seed``). ``none`` is prepended when ``include_none``.
+A catalog id is ``<category>:<filename-stem>`` (unique). Dropdowns always
+include ``random`` and ``increment`` (resolved at execute time from the
+node's ``seed``). ``none`` is prepended when ``include_none``. Catalog files
+and new category folders are discovered on page refresh / restart.
 """
 
 from __future__ import annotations
@@ -44,6 +56,18 @@ RANDOM_OPTION = "random"
 INCREMENT_OPTION = "increment"
 SPECIAL_OPTIONS: tuple[str, ...] = (NONE_OPTION, RANDOM_OPTION, INCREMENT_OPTION)
 _SPECIAL_SET = frozenset(SPECIAL_OPTIONS)
+
+# Category label for legacy files sitting directly in data/presets/.
+LEGACY_CATEGORY = "unfiled"
+
+# Preferred order of the category dropdown; unknown categories sort last.
+_CATEGORY_ORDER: tuple[str, ...] = (
+    "parts",
+    "sets/female",
+    "sets/male",
+    "sets/unisex",
+    LEGACY_CATEGORY,
+)
 
 
 def _is_special(text: str) -> bool:
@@ -74,27 +98,47 @@ def _title_from_slug(slug: str) -> str:
 
 
 def list_preset_files() -> List[Path]:
-    """Return sorted preset JSON paths (excludes files starting with ``_``)."""
+    """Return sorted preset JSON paths, walking category subfolders.
+
+    Files and folders whose name starts with ``_`` are ignored (drafts).
+    """
     if not PRESETS_DIR.is_dir():
         return []
-    files = [
-        p
-        for p in PRESETS_DIR.glob("*.json")
-        if p.is_file() and not p.name.startswith("_")
-    ]
-    return files
+    files = []
+    for p in PRESETS_DIR.glob("**/*.json"):
+        if not p.is_file() or p.name.startswith("_"):
+            continue
+        rel = p.relative_to(PRESETS_DIR)
+        if any(part.startswith("_") for part in rel.parts[:-1]):
+            continue
+        files.append(p)
+    return sorted(files)
+
+
+def _category_for_path(path: Path) -> str:
+    """Category = folder path relative to data/presets/; root → 'unfiled'."""
+    parent = path.parent.relative_to(PRESETS_DIR)
+    if parent == Path("."):
+        return LEGACY_CATEGORY
+    return parent.as_posix()
 
 
 def load_preset_file(path: Path) -> Dict[str, Any]:
-    """Load one preset JSON; always returns a normalized dict with defaults."""
+    """Load one preset JSON; always returns a normalized dict with defaults.
+
+    Adds ``category`` (folder path) and a unique ``id`` (``category:slug``).
+    """
     raw = load_json(path, default=None)
     slug = _slug_from_path(path)
+    category = _category_for_path(path)
 
     if not isinstance(raw, dict):
         logger.warning("Preset %s is not a JSON object — using fallback items", path)
         items = list(_FALLBACK_ITEMS.get(slug, ["example item"]))
         return {
-            "id": slug,
+            "id": f"{category}:{slug}",
+            "category": category,
+            "slug": slug,
             "label": _title_from_slug(slug),
             "description": f"Select {slug.replace('_', ' ')} and optional details.",
             "details_tooltip": "Color, material, style, condition, etc.",
@@ -153,7 +197,9 @@ def load_preset_file(path: Path) -> Dict[str, Any]:
         output_style = "item_then_details"
 
     return {
-        "id": slug,
+        "id": f"{category}:{slug}",
+        "category": category,
+        "slug": slug,
         "label": label.strip(),
         "description": str(description).strip(),
         "details_tooltip": str(details_tooltip).strip(),
@@ -166,28 +212,102 @@ def load_preset_file(path: Path) -> Dict[str, Any]:
     }
 
 
+def _category_sort_key(category: Optional[str]) -> tuple:
+    """Sort categories by _CATEGORY_ORDER; unknown categories sort last."""
+    cat = category or LEGACY_CATEGORY
+    try:
+        return (_CATEGORY_ORDER.index(cat),)
+    except ValueError:
+        return (len(_CATEGORY_ORDER),)
+
+
 def discover_presets() -> List[Dict[str, Any]]:
-    """Load all preset catalogs, sorted by sort_order then label."""
+    """Load all preset catalogs, sorted by category, sort_order, then label."""
     presets: List[Dict[str, Any]] = []
     for path in list_preset_files():
         try:
             presets.append(load_preset_file(path))
         except Exception as e:  # noqa: BLE001
             logger.error("Failed to load preset %s: %s", path, e)
-    presets.sort(key=lambda p: (p.get("sort_order", 1000), p.get("label", "").lower()))
+    presets.sort(
+        key=lambda p: (
+            _category_sort_key(p.get("category")),
+            p.get("sort_order", 1000),
+            p.get("label", "").lower(),
+        )
+    )
     return presets
 
 
 def get_preset(preset_id: str) -> Optional[Dict[str, Any]]:
-    """Reload and return one preset by id (filename stem), or None."""
+    """Return one preset by id (``category:slug``) or bare slug, or None."""
+    for preset in discover_presets():
+        if preset["id"] == preset_id or preset.get("slug") == preset_id:
+            return preset
+    # Legacy direct-file fallback for a bare root slug.
     path = PRESETS_DIR / f"{preset_id}.json"
-    if not path.is_file():
-        # Try case-insensitive match
-        for candidate in list_preset_files():
-            if _slug_from_path(candidate) == preset_id.lower():
-                return load_preset_file(candidate)
-        return None
-    return load_preset_file(path)
+    if path.is_file():
+        return load_preset_file(path)
+    return None
+
+
+def get_categories(presets: Optional[Sequence[Dict[str, Any]]] = None) -> List[str]:
+    """Sorted unique categories (folder paths) across all catalogs."""
+    items = list(presets) if presets is not None else discover_presets()
+    cats = sorted(
+        {p.get("category", LEGACY_CATEGORY) for p in items},
+        key=_category_sort_key,
+    )
+    return cats
+
+
+def get_presets_by_category(
+    category: str,
+    presets: Optional[Sequence[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+    """Catalogs in one category, sorted by sort_order then label."""
+    items = list(presets) if presets is not None else discover_presets()
+    return [p for p in items if p.get("category", LEGACY_CATEGORY) == category]
+
+
+def get_catalog_choices(
+    category: str,
+    presets: Optional[Sequence[Dict[str, Any]]] = None,
+) -> List[str]:
+    """Dropdown labels for the catalogs in a category.
+
+    Duplicate labels are disambiguated by appending the slug.
+    """
+    catalogs = get_presets_by_category(category, presets)
+    counts: Dict[str, int] = {}
+    for p in catalogs:
+        counts[p["label"]] = counts.get(p["label"], 0) + 1
+    choices = []
+    for p in catalogs:
+        label = p["label"]
+        if counts[label] > 1:
+            choices.append(f"{label} ({p['slug']})")
+        else:
+            choices.append(label)
+    return choices
+
+
+def find_preset_by_catalog_label(
+    category: str,
+    catalog_label: str,
+    presets: Optional[Sequence[Dict[str, Any]]] = None,
+) -> Optional[Dict[str, Any]]:
+    """Resolve a catalog dropdown label back to its preset dict, or None."""
+    catalogs = get_presets_by_category(category, presets)
+    low = (catalog_label or "").strip().lower()
+    for p in catalogs:
+        label = p["label"]
+        if label == catalog_label or low == f"{label.lower()} ({p['slug']})":
+            return p
+    for p in catalogs:
+        if p["label"].lower() == low:
+            return p
+    return None
 
 
 def get_dropdown_choices(preset: Dict[str, Any]) -> List[str]:

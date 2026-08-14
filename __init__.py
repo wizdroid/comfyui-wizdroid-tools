@@ -23,9 +23,10 @@ Includes:
 - VL Image Extract: vision-language reverse of a source image into a prompt,
   outfit flatlay, makeup description, or other selectable extract mode
   (spice-aware NSFW).
-- Presets: data-driven dropdown + details nodes (footwear, headgear, makeup,
-  …). Drop a new JSON under ``data/presets/`` and restart ComfyUI to get a
-  new node — plugin-style catalogs, no Python edits.
+- Presets: a single ``🧙 Preset`` node browses data-driven catalogs
+  (footwear, headgear, makeup, …) organized into category folders under
+  ``data/presets/`` (parts/, sets/female, sets/male, sets/unisex). Drop a
+  new JSON into a category folder and refresh ComfyUI — no Python edits.
 """
 
 __version__ = "2026.08.11"

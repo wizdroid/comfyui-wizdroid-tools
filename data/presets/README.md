@@ -1,12 +1,31 @@
 # Preset catalogs
 
-Each `*.json` file in this folder becomes one ComfyUI node under
-**🧙 Wizdroid / Presets**.
+One **🧙 Preset** node under **🧙 Wizdroid / Presets** browses every catalog in
+this folder via cascading dropdowns: **Category → Catalog → Item** (+ free-text
+`details` + `seed`).
 
-Edit freely. Save, then **refresh the ComfyUI browser page** so dropdowns reload.
-Generation always uses the latest file contents (mtime-cached).
+Catalogs are JSON files, grouped into **categories** by folder:
 
-Files starting with `_` are ignored (handy for drafts).
+```
+data/presets/
+├── parts/          # shared unisex part catalogs (tops, footwear, makeup, …)
+├── sets/
+│   ├── female/     # female complete-look sets
+│   ├── male/       # male complete-look sets
+│   └── unisex/     # gender-neutral sets
+└── *.json          # legacy root files → category "unfiled" (migrate later)
+```
+
+A catalog's category is its folder path relative to `data/presets/`. Files at
+the root load as category `unfiled` until you move them into a category
+folder — nothing breaks either way.
+
+Edit freely. Save, then **refresh the ComfyUI browser page** so dropdowns
+reload. Generation always uses the latest file contents (mtime-cached). New
+catalogs/folders are discovered on refresh; a restart is only needed if your
+ComfyUI caches node info aggressively.
+
+Files and folders starting with `_` are ignored (handy for drafts).
 
 ## Schema
 
@@ -61,12 +80,14 @@ Same seed + same catalog always resolve the same way. Default selection is
 If `item` is `none` and details are empty → empty string.  
 If `item` is `none` but details are set → details only.
 
-## Add a new preset node
+## Add a new catalog
 
-1. Create `data/presets/my_thing.json` with the schema above.
-2. Restart ComfyUI **once** so the new file is registered as a node class
-   (dropdown *values* hot-reload on page refresh; **new files** need a restart).
-3. Find **🧙 My Thing** under **🧙 Wizdroid / Presets**.
+1. Create `data/presets/<category>/my_thing.json` (or the root for
+   `unfiled`) with the schema above.
+2. **Refresh the ComfyUI browser page** — the universal **🧙 Preset** node
+   picks it up under `Category → Catalog`.
+3. If you created a brand-new *category* folder, restart ComfyUI once so the
+   new category appears in the `category` dropdown.
 
 ## Example: custom footwear entry
 
@@ -76,39 +97,45 @@ Open `footwear.json` and append to `items`:
 "platform mary janes"
 ```
 
-Refresh the browser page; the new option appears in the Footwear node dropdown.
+Refresh the browser page; the new option appears in the **🧙 Preset** node's
+`item` dropdown (after selecting the catalog).
 
 ## Built-in catalogs
 
-| File | Node |
-|------|------|
-| `footwear.json` | Footwear |
-| `headgear.json` | Headgear |
-| `hairstyle_extras.json` | Hairstyle Extras |
-| `expressions.json` | Expressions |
-| `makeup.json` | Makeup |
-| `eyewear.json` | Eyewear |
-| `jewelry.json` | Jewelry |
-| `piercings.json` | Piercings |
-| `tattoos.json` | Tattoos |
-| `body_markings.json` | Body Markings |
-| `gloves.json` | Gloves |
-| `nails.json` | Nails |
-| `neckwear.json` | Neckwear |
-| `tops.json` | Tops |
-| `bottoms.json` | Bottoms |
-| `outerwear.json` | Outerwear |
-| `hosiery.json` | Hosiery |
-| `bags.json` | Bags |
-| `accessories.json` | Accessories |
-| `props.json` | Props |
-| `weapons.json` | Weapons |
-| `goth_sets.json` | Complete Goth Set |
-| `characters.json` | Character Set |
-| `anime_cosplay.json` | Anime Cosplay Set |
-| `candid_mini_dresses.json` | Candid Mini Dress Set |
-| `glamorous_bodycon_dresses.json` | Glamorous Bodycon Dress Set |
-| `indian_casual_everyday.json` | Indian Casual Everyday Set |
-| `indian_chudidar_sets.json` | Indian Chudidar Set |
-| `indian_lehenga_sets.json` | Indian Lehenga Set |
-| `indian_sari_drapes.json` | Indian Sari Drape Set |
+All catalogs have been migrated into their category folders:
+
+| Category | File | Catalog |
+|----------|------|---------|
+| `parts` | `accessories.json` | Accessories |
+| `parts` | `bags.json` | Bags |
+| `parts` | `body_markings.json` | Body Markings |
+| `parts` | `bottoms.json` | Bottoms |
+| `parts` | `expressions.json` | Expressions |
+| `parts` | `eyewear.json` | Eyewear |
+| `parts` | `footwear.json` | Footwear |
+| `parts` | `gloves.json` | Gloves |
+| `parts` | `hairstyle_extras.json` | Hairstyle Extras |
+| `parts` | `headgear.json` | Headgear |
+| `parts` | `hosiery.json` | Hosiery |
+| `parts` | `jewelry.json` | Jewelry |
+| `parts` | `makeup.json` | Makeup |
+| `parts` | `nails.json` | Nails |
+| `parts` | `neckwear.json` | Neckwear |
+| `parts` | `outerwear.json` | Outerwear |
+| `parts` | `piercings.json` | Piercings |
+| `parts` | `props.json` | Props |
+| `parts` | `tattoos.json` | Tattoos |
+| `parts` | `tops.json` | Tops |
+| `parts` | `weapons.json` | Weapons |
+| `sets/unisex` | `anime_cosplay.json` | Anime Cosplay Set (male + female) |
+| `sets/unisex` | `characters.json` | Character Set (male + female) |
+| `sets/female` | `bollywood-80s.json` | 1980s Bollywood Disco Set |
+| `sets/female` | `candid_mini_dresses.json` | Candid Mini Dress Set |
+| `sets/female` | `glamorous_bodycon_dresses.json` | Glamorous Bodycon Dress Set |
+| `sets/female` | `goth_sets.json` | Complete Goth Set |
+| `sets/female` | `indian_casual_everyday.json` | Indian Casual Everyday Set |
+| `sets/female` | `indian_chudidar_sets.json` | Indian Chudidar Set |
+| `sets/female` | `indian_lehenga_sets.json` | Indian Lehenga Set |
+| `sets/female` | `indian_sari_drapes.json` | Indian Sari Drape Set |
+
+`sets/male/` is reserved for future male-oriented complete looks (empty for now).

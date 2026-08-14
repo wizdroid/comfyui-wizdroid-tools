@@ -1,23 +1,27 @@
-"""Wizdroid Tools — Preset nodes (dropdown + details → prompt fragment).
+"""Wizdroid Tools — Universal Preset node (category → catalog → item).
 
-One ComfyUI node is registered per JSON file under ``data/presets/``.
+One node browses every catalog under ``data/presets/`` via cascading
+dropdowns: Category (folder) → Catalog (JSON file) → Item (+ details + seed).
 Category: ``🧙 Wizdroid/Presets``.
+
+Drop a new catalog JSON into a category folder (or the root, ``unfiled``)
+and refresh the ComfyUI page — the universal node picks it up. See
+``data/presets/README.md`` for the layout.
 """
 
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Tuple, Type
+from typing import Any, Dict, Tuple
 
 from lib.presets import (
     NONE_OPTION,
-    class_name_for_preset,
     default_dropdown_choice,
-    discover_presets,
-    display_name_for_preset,
+    find_preset_by_catalog_label,
     format_preset_fragment,
+    get_catalog_choices,
+    get_categories,
     get_dropdown_choices,
-    get_preset,
     resolve_preset_item,
 )
 
@@ -26,129 +30,130 @@ logger = logging.getLogger(__name__)
 CATEGORY = "🧙 Wizdroid/Presets"
 
 
-def _make_preset_node_class(preset_id: str, label: str, description: str) -> Type:
-    """Build a node class bound to a single preset catalog id."""
-
-    class_name = class_name_for_preset(preset_id)
-
-    class PresetNode:
-        """Select a preset item and optional free-text details."""
-
-        CATEGORY = CATEGORY
-        RETURN_TYPES = ("STRING",)
-        RETURN_NAMES = ("text",)
-        FUNCTION = "build"
-        OUTPUT_NODE = False
-
-        @classmethod
-        def INPUT_TYPES(cls) -> Dict[str, Any]:
-            # Reload JSON on every UI query so edits appear after browser refresh
-            preset = get_preset(preset_id)
-            if preset is None:
-                choices = [NONE_OPTION]
-                details_tooltip = "Free-text details (color, material, etc.)"
-                desc = description
-            else:
-                choices = get_dropdown_choices(preset)
-                details_tooltip = preset.get(
-                    "details_tooltip",
-                    "Free-text details (color, material, etc.)",
-                )
-                desc = preset.get("description") or description
-
-            # DESCRIPTION is class-level; update when possible
-            cls.DESCRIPTION = desc
-
-            return {
-                "required": {
-                    "item": (
-                        choices,
-                        {
-                            "default": default_dropdown_choice(choices),
-                            "tooltip": (
-                                f"{label} type from data/presets/{preset_id}.json. "
-                                f"'{NONE_OPTION}' skips the type (details alone still emit). "
-                                "'random' picks uniformly from the catalog. "
-                                "'increment' walks the catalog as seed changes."
-                            ),
-                        },
-                    ),
-                    "details": (
-                        "STRING",
-                        {
-                            "default": "",
-                            "multiline": False,
-                            "tooltip": details_tooltip,
-                        },
-                    ),
-                    "seed": (
-                        "INT",
-                        {
-                            "default": 0,
-                            "min": 0,
-                            "max": 0xFFFFFFFF,
-                            "tooltip": (
-                                "Drives 'random' and 'increment'. Same seed + same "
-                                "catalog → same item (deterministic)."
-                            ),
-                        },
-                    ),
-                },
-            }
-
-        def build(
-            self,
-            item: str = NONE_OPTION,
-            details: str = "",
-            seed: int = 0,
-        ) -> Tuple[str]:
-            preset = get_preset(preset_id)
-            style = "item_then_details"
-            catalog: List[str] = []
-            if preset is not None:
-                style = preset.get("output_style") or style
-                catalog = list(preset.get("items") or [])
-            resolved = resolve_preset_item(item, catalog, seed)
-            fragment = format_preset_fragment(
-                resolved or NONE_OPTION, details, output_style=style
-            )
-            return (fragment,)
-
-    PresetNode.__name__ = class_name
-    PresetNode.__qualname__ = class_name
-    PresetNode.DESCRIPTION = description
-    return PresetNode
+_FALLBACK_DESCRIPTION = (
+    "Browse preset catalogs by category and pick an item to emit a prompt fragment."
+)
+_FALLBACK_TOOLTIP = "Free-text details (color, material, style, …)."
 
 
-def _build_mappings() -> Tuple[Dict[str, Type], Dict[str, str]]:
-    class_map: Dict[str, Type] = {}
-    display_map: Dict[str, str] = {}
+class WizdroidPresetPicker:
+    """Compose a prompt fragment from a categorized preset catalog."""
 
-    presets = discover_presets()
-    if not presets:
-        logger.warning(
-            "No preset JSON found under data/presets/ — Preset nodes not registered"
+    CATEGORY = CATEGORY
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
+    FUNCTION = "build"
+    OUTPUT_NODE = False
+
+    # Last chosen category/catalog, cached so INPUT_TYPES can rebuild the
+    # dependent dropdowns for that selection. ComfyUI re-invokes INPUT_TYPES on
+    # widget change in recent versions; if your UI doesn't auto-refresh, a page
+    # refresh syncs the catalog/item dropdowns to the chosen category.
+    _last_category: str = NONE_OPTION
+    _last_catalog: str = NONE_OPTION
+
+    @classmethod
+    def INPUT_TYPES(cls) -> Dict[str, Any]:
+        categories = get_categories() or [NONE_OPTION]
+        current_category = (
+            cls._last_category if cls._last_category in categories else categories[0]
         )
-        return class_map, display_map
 
-    for preset in presets:
-        pid = preset["id"]
-        label = preset["label"]
-        desc = preset.get("description") or f"Preset: {label}"
-        cls = _make_preset_node_class(pid, label, desc)
-        class_name = class_name_for_preset(pid)
-        if class_name in class_map:
-            logger.warning(
-                "Duplicate preset class name %s for id %s — skipping",
-                class_name,
-                pid,
-            )
-            continue
-        class_map[class_name] = cls
-        display_map[class_name] = display_name_for_preset(label)
-        logger.debug("Registered preset node %s (%s)", class_name, pid)
+        catalog_choices = get_catalog_choices(current_category) or [NONE_OPTION]
+        current_catalog = (
+            cls._last_catalog
+            if cls._last_catalog in catalog_choices
+            else catalog_choices[0]
+        )
 
-    return class_map, display_map
+        preset = find_preset_by_catalog_label(current_category, current_catalog)
+        item_choices = get_dropdown_choices(preset) if preset else [NONE_OPTION]
+        cls.DESCRIPTION = preset.get("description") if preset else _FALLBACK_DESCRIPTION
+        details_tooltip = (
+            preset.get("details_tooltip") if preset else _FALLBACK_TOOLTIP
+        )
+
+        return {
+            "required": {
+                "category": (
+                    categories,
+                    {
+                        "default": current_category,
+                        "tooltip": (
+                            "Preset category = folder under data/presets/. "
+                            "Root files are the 'unfiled' category until moved."
+                        ),
+                    },
+                ),
+                "catalog": (
+                    catalog_choices,
+                    {
+                        "default": current_catalog,
+                        "tooltip": "Catalog JSON within the selected category.",
+                    },
+                ),
+                "item": (
+                    item_choices,
+                    {
+                        "default": default_dropdown_choice(item_choices),
+                        "tooltip": (
+                            f"Item from the selected catalog. '{NONE_OPTION}' skips the "
+                            "item (details alone still emit). 'random' picks uniformly; "
+                            "'increment' walks the catalog as the seed changes."
+                        ),
+                    },
+                ),
+                "details": (
+                    "STRING",
+                    {
+                        "default": "",
+                        "multiline": False,
+                        "tooltip": details_tooltip,
+                    },
+                ),
+                "seed": (
+                    "INT",
+                    {
+                        "default": 0,
+                        "min": 0,
+                        "max": 0xFFFFFFFF,
+                        "tooltip": (
+                            "Drives 'random' and 'increment'. Same seed + same "
+                            "catalog → same item (deterministic)."
+                        ),
+                    },
+                ),
+            },
+        }
+
+    def build(
+        self,
+        category: str = NONE_OPTION,
+        catalog: str = NONE_OPTION,
+        item: str = NONE_OPTION,
+        details: str = "",
+        seed: int = 0,
+    ) -> Tuple[str]:
+        # Remember the selection for the next INPUT_TYPES call.
+        type(self)._last_category = category
+        type(self)._last_catalog = catalog
+
+        preset = find_preset_by_catalog_label(category, catalog)
+        if preset is None:
+            return ("",)
+
+        style = preset.get("output_style") or "item_then_details"
+        catalog_items = list(preset.get("items") or [])
+        resolved = resolve_preset_item(item, catalog_items, seed)
+        fragment = format_preset_fragment(
+            resolved or NONE_OPTION, details, output_style=style
+        )
+        return (fragment,)
 
 
-NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS = _build_mappings()
+NODE_CLASS_MAPPINGS = {
+    "WizdroidPresetPicker": WizdroidPresetPicker,
+}
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "WizdroidPresetPicker": "🧙 Preset",
+}

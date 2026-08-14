@@ -115,9 +115,12 @@ Spice/detail for NSFW density still come from `prompts/spice.json` and
 3. Optionally set a default BPM in `lyrics/choices.json` → `default_bpm_by_structure`.
 4. Refresh ComfyUI.
 
-## Add a Preset node (plugin-style)
+## Add a Preset catalog
 
-1. Create `presets/my_category.json`:
+Catalogs are JSON files browsed by a single **🧙 Preset** node under
+`🧙 Wizdroid/Presets` (Category → Catalog → Item → Details). Drop a file into
+a category folder (`parts/`, `sets/female/`, `sets/male/`, `sets/unisex/`,
+or the root = `unfiled`):
 
 ```json
 {
@@ -129,15 +132,13 @@ Spice/detail for NSFW density still come from `prompts/spice.json` and
 }
 ```
 
-2. **Restart ComfyUI** once so the new node class is registered.
-3. Find it under `🧙 Wizdroid/Presets`.
-
-Editing items inside an existing file only needs a **browser refresh**.
-See `presets/README.md` for full schema and `output_style` options.
+Refresh the ComfyUI page to pick it up in the **🧙 Preset** node; a brand-new
+*category folder* needs one restart to appear in the category dropdown.
+See `presets/README.md` for the full schema, `output_style`, and layout.
 
 ## Notes
 
 - Keys under rewrite `modes.json` are the ComfyUI dropdown values (stable ids).
 - Use `\n` in JSON strings for multi-line instructions.
 - Invalid JSON falls back to built-in minimal defaults and is logged.
-- Preset **item lists** hot-reload on page refresh; **new preset files** need a ComfyUI restart.
+- Preset catalogs hot-reload on page refresh; a **new category folder** needs one ComfyUI restart to appear in the `category` dropdown.
