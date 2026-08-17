@@ -142,6 +142,58 @@ Data:
 
 ---
 
+### 2b. High-Energy Portrait
+
+Class: `WizdroidHighEnergyPortrait`
+
+Fill the **Universal High-Energy Portrait Template** from slot inputs.
+
+Two modes:
+
+- `use_ai=True` -- send the provided slots plus the template skeleton to
+  Ollama, which formats a finished prompt. Empty slots are invented to
+  match the genre; filled slots are never contradicted.
+- `use_ai=False` -- mechanical fill of the template (JSON defaults for
+  missing slots, no network).
+
+If Ollama fails in AI mode, the node falls back to the mechanical fill
+and appends `# [AI unavailable — template fallback]`.
+
+`variant`:
+
+| Value | Output |
+|-------|--------|
+| `full` | Section headers (Style / Genre Anchor, Subject & Energy, …) |
+| `compact` | One dense paragraph, no headers |
+
+Quick-fill fields map to the template's bracketed slots. Type a custom
+style in `style_custom` to override the `style_genre` dropdown (e.g.
+`cyberpunk neon noir`). Dropdowns support `none` / `random` / `increment`
+like the character node. Wire preset fragments into `clothing`,
+`accessories`, `hair`, or `makeup`.
+
+| Group | Fields |
+|-------|--------|
+| Controls | `ollama_url`, `ollama_model`, `use_ai`, `variant`, `seed`, `temperature`, `max_tokens`, `spice` / `fantasy` / `detail`, `lora_trigger` |
+| Style anchor | `style_genre`, `style_custom`, `adjective`, `character_type`, `shot_type` |
+| Subject | `gender`, `presence`, `energy`, `facial_features` |
+| Outfit | `clothing`, `materials`, `fabric_light`, `silhouette`, `cut_details` |
+| Styling | `accessories`, `hair`, `makeup` |
+| Pose | `pose_energy`, `pose_angle`, `body_language` |
+| Light | `lighting_type`, `fill`, `colors`, `background`, `film_stock` |
+| Extra | `extra_instructions` |
+
+Output:
+
+| Name | Type | Meaning |
+|------|------|---------|
+| `prompt` | STRING | High-energy portrait prompt |
+
+Data: `data/portrait/choices.json`, `data/portrait/system.json`; spice /
+fantasy / detail from `data/prompts/`.
+
+---
+
 ### 3. Video Scene Generator (Text)
 
 Class: `WizdroidLLMSceneGenerator`
@@ -583,6 +635,7 @@ Nothing important is hard-coded. Edit JSON, save, refresh the ComfyUI page
 data/
   prompts/      # image prompt generator + character AI guidance
   character/    # character dropdowns + templates
+  portrait/     # high-energy portrait template + slot dropdowns
   scene/        # video scene mood/style + VL/text templates
   vl_extract/   # VL image extract modes + system templates
   lyrics/       # ACE-Step structures, choices, templates
@@ -617,6 +670,7 @@ comfyui-wizdroid-tools/
     constants.py
     prompts.py                # image prompt templates
     character_prompts.py      # character resolve + template
+    portrait_prompts.py       # high-energy portrait template fill
     scene_prompts.py          # video scene text/VL templates
     vl_extract_prompts.py     # VL image extract modes
     lyrics_prompts.py
@@ -625,6 +679,7 @@ comfyui-wizdroid-tools/
   nodes/
     llm_prompt_generator.py
     llm_character_prompt.py
+    llm_high_energy_portrait.py  # Universal High-Energy Portrait Template
     llm_scene_generator.py    # text → video scene package
     llm_vl_scene_generator.py # image + text → video scene package
     llm_vl_extract.py         # image → prompt / flatlay / makeup / …

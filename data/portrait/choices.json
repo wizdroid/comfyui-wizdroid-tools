@@ -1,0 +1,120 @@
+{
+  "gender": [
+    "female",
+    "male",
+    "nonbinary"
+  ],
+  "adjective": [
+    "striking",
+    "electric",
+    "magnetic",
+    "fierce",
+    "luminous",
+    "glamorous",
+    "dangerous",
+    "radiant",
+    "commanding",
+    "untamed",
+    "icy",
+    "smoldering"
+  ],
+  "character_type": [
+    "woman",
+    "man",
+    "person",
+    "idol",
+    "dancer",
+    "performer",
+    "model",
+    "rockstar",
+    "heroine",
+    "antihero"
+  ],
+  "style_genre": [
+    "cyberpunk neon noir",
+    "1980s Bollywood disco",
+    "1970s Hollywood glamour",
+    "neo-noir",
+    "1990s Hong Kong nightclub cinema",
+    "1970s Madras studio calendar art",
+    "studio fashion editorial",
+    "rockstar arena glamour",
+    "high-fashion vogue",
+    "retro disco",
+    "dark romantic",
+    "electric pop idol",
+    "golden-age Hollywood",
+    "synthwave",
+    "high-energy street style",
+    "royal baroque glam",
+    "underground club",
+    "desert heat editorial",
+    "old Hollywood noir"
+  ],
+  "shot_type": [
+    "medium close-up studio",
+    "close-up",
+    "beauty close-up",
+    "waist-up portrait",
+    "three-quarter portrait",
+    "fashion editorial",
+    "cinematic portrait"
+  ],
+  "presence": [
+    "strong",
+    "intense",
+    "magnetic",
+    "playful",
+    "dangerous"
+  ],
+  "energy": [
+    "high-energy",
+    "theatrical",
+    "confrontational",
+    "seductive",
+    "powerful",
+    "cold and dangerous"
+  ],
+  "fabric_light": [
+    "heavy specular highlights",
+    "soft sheen",
+    "sharp reflections",
+    "wet-look gleam",
+    "velvet-deep absorption with edge sparkle",
+    "metallic flash"
+  ],
+  "silhouette": [
+    "structured",
+    "dramatic",
+    "sharp",
+    "flowing"
+  ],
+  "pose_energy": [
+    "confident",
+    "theatrical",
+    "intense",
+    "dynamic"
+  ],
+  "pose_angle": [
+    "front-facing",
+    "three-quarter",
+    "slight angle"
+  ],
+  "lighting_type": [
+    "studio",
+    "cinematic"
+  ],
+  "fill": [
+    "soft",
+    "minimal"
+  ],
+  "film_stock": [
+    "Kodak Portra 400",
+    "cinematic 35mm color negative",
+    "Kodak Ektar 100",
+    "Fuji Pro 400H",
+    "tungsten-balanced motion picture stock",
+    "cross-processed slide film",
+    "1970s saturated color film"
+  ]
+}

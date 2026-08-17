@@ -12,6 +12,8 @@ Includes:
   image + in-session memory).
 - Character Prompt Generator: Build a character via dropdowns, then generate
   an image prompt via Ollama or a plain template.
+- High-Energy Portrait: Fill the Universal High-Energy Portrait Template from
+  slot inputs via Ollama (or a mechanical fill).
 - LLM Lyrics Generator: ACE-Step 1.5 structured lyrics + tags via Ollama.
 - LLM Text Rewriter: Mode-based rewrite (clean-up, formalize, humanize, pirate,
   custom instruction, …) via Ollama.
@@ -92,6 +94,10 @@ _character_nodes = _import_node_module("llm_character_prompt")
 CHARACTER_NODE_CLASS_MAPPINGS = _character_nodes.NODE_CLASS_MAPPINGS
 CHARACTER_DISPLAY_NAME_MAPPINGS = _character_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
+_portrait_nodes = _import_node_module("llm_high_energy_portrait")
+PORTRAIT_NODE_CLASS_MAPPINGS = _portrait_nodes.NODE_CLASS_MAPPINGS
+PORTRAIT_DISPLAY_NAME_MAPPINGS = _portrait_nodes.NODE_DISPLAY_NAME_MAPPINGS
+
 _qwen_multi_angles = _import_node_module("llm_qwen_multi_angles")
 QWEN_MULTI_ANGLES_CLASS_MAPPINGS = _qwen_multi_angles.NODE_CLASS_MAPPINGS
 QWEN_MULTI_ANGLES_DISPLAY_NAME_MAPPINGS = _qwen_multi_angles.NODE_DISPLAY_NAME_MAPPINGS
@@ -147,6 +153,7 @@ NODE_CLASS_MAPPINGS = {
     **LYRICS_NODE_CLASS_MAPPINGS,
     **REWRITE_NODE_CLASS_MAPPINGS,
     **CHARACTER_NODE_CLASS_MAPPINGS,
+    **PORTRAIT_NODE_CLASS_MAPPINGS,
     **QWEN_MULTI_ANGLES_CLASS_MAPPINGS,
     **SCENE_NODE_CLASS_MAPPINGS,
     **VL_SCENE_NODE_CLASS_MAPPINGS,
@@ -164,6 +171,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **LYRICS_DISPLAY_NAME_MAPPINGS,
     **REWRITE_DISPLAY_NAME_MAPPINGS,
     **CHARACTER_DISPLAY_NAME_MAPPINGS,
+    **PORTRAIT_DISPLAY_NAME_MAPPINGS,
     **QWEN_MULTI_ANGLES_DISPLAY_NAME_MAPPINGS,
     **SCENE_DISPLAY_NAME_MAPPINGS,
     **VL_SCENE_DISPLAY_NAME_MAPPINGS,

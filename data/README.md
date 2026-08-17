@@ -16,6 +16,9 @@ data/
 ├── character/               # Character Prompt Generator
 │   ├── choices.json         # dropdown concrete values per attribute
 │   └── system.json          # system/user templates ({character_json}, guidance)
+├── portrait/                # High-Energy Portrait Template
+│   ├── choices.json         # slot dropdowns (style, energy, pose, lighting, …)
+│   └── system.json          # full/compact templates + system/user prompts
 ├── scene/                   # Video scene generators (text + VL)
 │   ├── choices.json         # mood, style dropdowns
 │   ├── system.json          # generic text/vl system + user templates

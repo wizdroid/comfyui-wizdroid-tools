@@ -1,0 +1,39 @@
+{
+  "defaults": {
+    "adjective": "striking",
+    "character_type": "woman",
+    "style_genre": "high-energy cinematic glamour",
+    "shot_type": "medium close-up studio",
+    "presence": "magnetic",
+    "facial_features": "sharp features and locked eye contact",
+    "energy": "high-energy",
+    "clothing": "a tailored statement outfit",
+    "materials": "satin and metallic fabric",
+    "fabric_light": "heavy specular highlights",
+    "silhouette": "structured",
+    "cut_details": "a sharp neckline and defined shoulders",
+    "accessories": "Statement jewelry",
+    "hair": "voluminous and sculpted",
+    "makeup": "Bold eyes, glossy lips, and sharp brows",
+    "pose_energy": "confident",
+    "pose_angle": "three-quarter",
+    "body_language": "hands placed with intent",
+    "lighting_type": "cinematic",
+    "fill": "soft",
+    "colors": "rich and saturated",
+    "background": "dark and atmospheric",
+    "film_stock": "cinematic 35mm color negative"
+  },
+  "full_template": "[Style / Genre Anchor]\nA {adjective} {character_type} in the {style_genre} aesthetic, captured in a {shot_type} portrait.\n\nSubject & Energy\n{pronoun_cap} has a {presence} presence, with {facial_features}. The overall energy is {energy}.\n\nOutfit & Materials\n{pronoun_cap} wears {clothing} made of {materials}. The fabric has {fabric_light}. The silhouette is {silhouette}, with {cut_details}.\n\nAccessories\n{accessories}, catching light and adding visual weight.\n\nHair\nHair is {hair}, framed to keep the face dominant.\n\nMakeup / Styling\n{makeup}.\n\nPose & Framing\nPose is {pose_energy}. {pose_angle_cap}, upper body, with {body_language}. The subject fills the frame with strong presence.\n\nLighting & Atmosphere\nDramatic {lighting_type} lighting: strong key light creating bright specular highlights on skin and materials, {fill} fill, and a glowing rim light that separates the subject from the background. Colors are {colors}. Background is {background}.\n\nTechnical Look\nShot with {film_stock}, visible fine film grain, gentle glow around highlights, shallow depth of field. High visual energy, rich color, cinematic contrast.\n\nQuality Line\nPhotorealistic, highly detailed textures and light reflections, {style_genre} glamour/energy, no modern digital sharpness, no flat lighting.",
+  "compact_template": "A {adjective} {character_type} in the {style_genre} aesthetic, captured in a {shot_type} portrait. {pronoun_cap} has a {presence} presence, with {facial_features}. The overall energy is {energy}. {pronoun_cap} wears {clothing} made of {materials}; the fabric has {fabric_light}. The silhouette is {silhouette}, with {cut_details}. {accessories}, catching light. Hair is {hair}. {makeup}. Pose is {pose_energy}; {pose_angle}, upper body, with {body_language}. Dramatic {lighting_type} lighting, {fill} fill, glowing rim light. Colors are {colors}. Background is {background}. Shot with {film_stock}, fine film grain, gentle highlight glow, shallow depth of field. Photorealistic, {style_genre} glamour/energy, no modern digital sharpness, no flat lighting.",
+  "variant_full": "Write the FULL Universal High-Energy Portrait. Keep the section headers exactly (Style / Genre Anchor, Subject & Energy, Outfit & Materials, Accessories, Hair, Makeup / Styling, Pose & Framing, Lighting & Atmosphere, Technical Look, Quality Line). Write 1–3 sentences per section. Do not add extra sections or a title.",
+  "variant_compact": "Write the COMPACT Universal High-Energy Portrait: one continuous paragraph (or two short ones), no section headers, no bullets. Same slot order as the skeleton. Dense and punchy.",
+  "system_prompt_template": "You are a prompt formatter for AI image generators. Your only job is to fill the Universal High-Energy Portrait Template using the provided slots.\n\n## OUTPUT CONTRACT\nOutput exactly ONE thing: the finished image prompt.\nDo NOT output:\n- Explanations, preambles, labels like \"here is the prompt\", or commentary\n- Markdown fences or quotation marks wrapping the whole prompt\n- Bullet lists or numbered lists\n- Invented second characters or crowds unless extra_instructions require it\n\n## VARIANT\n{variant_instruction}\n\n## LENGTH\nTarget about {max_tokens} words. Prefer visual density over filler. If you must cut, trim atmosphere before identity (subject, outfit, pose, lighting).\n\n## HOW TO FILL THE TEMPLATE\n- Honor every provided slot. Never contradict, replace, or omit an explicit value.\n- Invent coherent, genre-true detail ONLY for unfilled slots (null / missing).\n- Keep the high-energy portrait DNA: specular light on skin and materials, strong presence, subject filling the frame, rim light, film grain, no flat lighting, no modern digital sharpness.\n- Weave extra_instructions when present; they refine atmosphere but must not erase explicit slots.\n- If lora_trigger is present, begin the prompt with it exactly, then a comma, then the rest.\n- Pronouns must stay consistent with gender / character_type.\n- Do not print leftover [brackets] or {{braces}}. Every slot must be real words.\n- Makeup / Styling should be a complete sentence if the variant keeps that line.\n\n## SKELETON (structure to follow)\n{skeleton}\n\n## PROVIDED SLOTS (source of truth)\n{slots_json}\n\n## CONTENT RULES\nFollow these rules exactly when writing the prompt:\n\n{spice_guidance}\n\n{fantasy_guidance}\n\n{detail_guidance}\n\n## FINAL CHECK\n- Every provided slot appears in the prose.\n- Unfilled slots are invented to match style_genre and energy.\n- Correct variant (headers vs compact).\n- Output only the prompt text.",
+  "user_prompt_template": "Fill the Universal High-Energy Portrait Template. Follow the skeleton and honor every provided slot. Invent only the missing ones so they match the genre. Output only the finished prompt.\n\nSkeleton:\n{skeleton}\n\nSlots:\n{slots_json}",
+  "strip_prefixes": [
+    "prompt:",
+    "image prompt:",
+    "finished prompt:",
+    "here is the prompt:"
+  ]
+}
