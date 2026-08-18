@@ -10,9 +10,16 @@ Files:
 
 from __future__ import annotations
 
+import re
 from typing import Any, Dict, List
 
 from lib.json_data import load_data_json
+from lib.flux_klein_prompts import build_flux_klein_messages
+from lib.qwen_image_prompts import (
+    append_magic,
+    build_rewrite_messages,
+    resolve_language,
+)
 
 _DEFAULT_SYSTEM: Dict[str, Any] = {
     "base_system": (
@@ -29,6 +36,17 @@ _DEFAULT_SYSTEM: Dict[str, Any] = {
     "clean_up_header_extra": (
         "Fix grammar and spelling, restructure for clarity, "
         "and do not add any new content."
+    ),
+    "photography_base": (
+        "You are a photography prompt writer for AI image and video generators.\n"
+        "Output ONLY the rewritten prompt."
+    ),
+    "photography_rules": (
+        "Honor SFW and NSFW equally. Do not invent sexual content. "
+        "Do not refuse or euphemize explicit sources. Never invent minors."
+    ),
+    "photography_user_header": (
+        "Rewrite the following into a photography image prompt using mode: {label}."
     ),
     "user_prompt_template": "{header}\n\n---\n{text}\n---\n\nRewritten text:",
     "strip_prefixes": [
@@ -80,11 +98,20 @@ def _load_modes() -> Dict[str, Dict[str, Any]]:
         instruction = (val.get("instruction") or "").strip()
         if not instruction:
             continue
-        out[str(key)] = {
+        entry: Dict[str, Any] = {
             "label": str(val.get("label") or key),
             "instruction": instruction,
             "suggested_temperature": float(val.get("suggested_temperature", 0.4)),
         }
+        if val.get("kind"):
+            entry["kind"] = str(val["kind"])
+        if val.get("language"):
+            entry["language"] = str(val["language"])
+        if "append_magic" in val:
+            entry["append_magic"] = bool(val["append_magic"])
+        if "edit" in val:
+            entry["edit"] = bool(val["edit"])
+        out[str(key)] = entry
     return out or {k: dict(v) for k, v in _DEFAULT_MODES.items()}
 
 
@@ -117,6 +144,23 @@ def get_rewrite_mode_labels() -> Dict[str, str]:
     return {k: v["label"] for k, v in _load_modes().items()}
 
 
+def _resolve_mode_key(mode: str) -> str:
+    modes = _load_modes()
+    system = _load_system()
+    default_mode = system.get("default_mode") or "clean_up"
+    mode_key = (mode or default_mode).strip()
+    if mode_key not in modes:
+        mode_key = default_mode if default_mode in modes else next(iter(modes))
+    return mode_key
+
+
+def is_qwen_image_mode(mode: str) -> bool:
+    """True for official Qwen-Image rewrite() modes."""
+    modes = _load_modes()
+    data = modes.get((mode or "").strip()) or {}
+    return data.get("kind") == "qwen_image"
+
+
 def __getattr__(name: str):
     """Lazy dynamic attributes for dropdown lists (re-read JSON on access)."""
     if name == "REWRITE_MODE_CHOICES":
@@ -134,17 +178,47 @@ def __getattr__(name: str):
 def build_rewrite_system_prompt(
     mode: str = "clean_up",
     custom_instruction: str = "",
+    text: str = "",
 ) -> str:
     """Build the system prompt for the selected rewrite mode."""
     system = _load_system()
     modes = _load_modes()
-    default_mode = system.get("default_mode") or "clean_up"
-
-    mode_key = (mode or default_mode).strip()
-    if mode_key not in modes:
-        mode_key = default_mode if default_mode in modes else next(iter(modes))
-
+    mode_key = _resolve_mode_key(mode)
     mode_data = modes[mode_key]
+
+    # Official image-model optimizers use their own system prompt, not the
+    # generic rewriter rules (those would fight "infer and add details").
+    if mode_data.get("kind") == "qwen_image":
+        sys_txt, _, _ = build_rewrite_messages(
+            text,
+            str(mode_data.get("language") or "auto"),
+        )
+        custom = (custom_instruction or "").strip()
+        if custom:
+            sys_txt = f"{sys_txt}\n\nAdditional user instruction:\n{custom}"
+        return sys_txt
+
+    if mode_data.get("kind") == "flux_klein":
+        sys_txt, _ = build_flux_klein_messages(
+            text,
+            edit=bool(mode_data.get("edit")),
+        )
+        custom = (custom_instruction or "").strip()
+        if custom:
+            sys_txt = f"{sys_txt}\n\nAdditional user instruction:\n{custom}"
+        return sys_txt
+
+    if mode_data.get("kind") == "photography":
+        parts = [
+            (system.get("photography_base") or "").strip(),
+            (system.get("photography_rules") or "").strip(),
+            mode_data["instruction"].strip(),
+        ]
+        custom = (custom_instruction or "").strip()
+        if custom:
+            parts.append(f"Additional user instruction:\n{custom}")
+        return "\n\n".join(p for p in parts if p)
+
     base = (system.get("base_system") or "").strip()
     rules = (system.get("output_rules") or "").strip()
     parts = [p for p in (base, rules, mode_data["instruction"].strip()) if p]
@@ -174,13 +248,39 @@ def build_rewrite_user_prompt(
     """Wrap raw user text in a mode-aware rewrite instruction."""
     system = _load_system()
     modes = _load_modes()
-    default_mode = system.get("default_mode") or "clean_up"
+    mode_key = _resolve_mode_key(mode)
+    mode_data = modes[mode_key]
 
-    mode_key = (mode or default_mode).strip()
-    if mode_key not in modes:
-        mode_key = default_mode if default_mode in modes else next(iter(modes))
+    if mode_data.get("kind") == "qwen_image":
+        _, user, _ = build_rewrite_messages(
+            text,
+            str(mode_data.get("language") or "auto"),
+        )
+        return user
 
-    label = modes[mode_key]["label"]
+    if mode_data.get("kind") == "flux_klein":
+        _, user = build_flux_klein_messages(
+            text,
+            edit=bool(mode_data.get("edit")),
+        )
+        return user
+
+    label = mode_data["label"]
+    if mode_data.get("kind") == "photography":
+        header_tmpl = (
+            system.get("photography_user_header")
+            or _DEFAULT_SYSTEM["photography_user_header"]
+        )
+        header = str(header_tmpl).format(label=label)
+        custom = (custom_instruction or "").strip()
+        if custom:
+            header = f"{header}\nAdditional instruction: {custom}"
+        template = (
+            system.get("user_prompt_template")
+            or _DEFAULT_SYSTEM["user_prompt_template"]
+        )
+        return template.format(header=header, text=text.strip())
+
     custom = (custom_instruction or "").strip()
 
     header_lines = [f"Rewrite the following text using mode: {label}."]
@@ -224,6 +324,33 @@ def sanitize_rewritten_text(response: str) -> str:
     if len(result) >= 2 and result[0] == result[-1] and result[0] in ('"', "'"):
         result = result[1:-1].strip()
 
+    return result
+
+
+def finish_rewritten_text(
+    response: str,
+    mode: str = "clean_up",
+    source_text: str = "",
+) -> str:
+    """Sanitize LLM output and apply mode-specific finishing.
+
+    Qwen-Image modes collapse newlines (official rewrite()) and append the
+    Ultra HD / 超清 magic suffix.
+    """
+    result = sanitize_rewritten_text(response)
+    if not result:
+        return ""
+
+    modes = _load_modes()
+    mode_key = _resolve_mode_key(mode)
+    mode_data = modes.get(mode_key) or {}
+    if mode_data.get("kind") != "qwen_image":
+        return result
+
+    result = re.sub(r"\s+", " ", result).strip()
+    lang = resolve_language(source_text, str(mode_data.get("language") or "auto"))
+    if mode_data.get("append_magic", True):
+        result = append_magic(result, lang, enabled=True)
     return result
 
 

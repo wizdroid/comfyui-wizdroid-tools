@@ -15,8 +15,8 @@ Includes:
 - High-Energy Portrait: Fill the Universal High-Energy Portrait Template from
   slot inputs via Ollama (or a mechanical fill).
 - LLM Lyrics Generator: ACE-Step 1.5 structured lyrics + tags via Ollama.
-- LLM Text Rewriter: Mode-based rewrite (clean-up, formalize, humanize, pirate,
-  custom instruction, …) via Ollama.
+- LLM Text Rewriter: Mode-based rewrite (clean-up, Qwen-Image, FLUX.2 Klein 9B
+  upsampling, custom, length/tone, …) via Ollama.
 - Qwen Multi-Angles LoRA Prompt: Non-AI utility that builds the proper
   ``<sks>`` prompt string for the fal/Qwen-Image-Edit-2511-Multiple-Angles-LoRA
   (96 camera poses).

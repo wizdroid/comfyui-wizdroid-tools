@@ -26,6 +26,10 @@ data/
 ├── vl_extract/              # VL Image Extract (modes + templates)
 │   ├── modes.json           # mode_id → label, instruction, suggested_*
 │   └── system.json          # base system, mode_order, user template
+├── qwen_image/              # Official Qwen-Image rewrite() / polish_edit_prompt
+│   └── system.json          # EN/ZH optimizer templates + magic suffixes
+├── flux_klein/              # Official FLUX.2 [klein] 9B prompt upsampling
+│   └── system.json          # T2I + edit system prompts from the BFL HF space
 ├── rewrite/                 # LLM Text Rewriter
 │   ├── modes.json           # mode_id → label, instruction, suggested_temperature
 │   └── system.json          # base system, output rules, mode_order, templates

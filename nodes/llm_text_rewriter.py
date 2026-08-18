@@ -1,7 +1,7 @@
 """Wizdroid Tools - LLM Text Rewriter Node.
 
 Mode-based text converter (Perchance-style): clean up messy prose, or rewrite
-into formal / casual / shorter / pirate / custom styles via Ollama.
+into formal / casual / shorter / Qwen-Image / FLUX Klein / custom styles via Ollama.
 """
 
 from __future__ import annotations
@@ -14,9 +14,9 @@ from lib.ollama_client import collect_models, generate_text
 from lib.rewrite_prompts import (
     build_rewrite_system_prompt,
     build_rewrite_user_prompt,
+    finish_rewritten_text,
     get_rewrite_mode_choices,
     get_rewrite_mode_labels,
-    sanitize_rewritten_text,
 )
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,8 @@ class WizdroidLLMTextRewriter:
     """Rewrite or restyle text via Ollama with preset modes + custom instruction.
 
     Default mode **clean_up** only fixes grammar/spelling/structure (no new content).
-    Other modes mirror common converters (formalize, humanize, shorter, pirate, …).
+    Other modes include official Qwen-Image / FLUX.2 Klein prompt upsampling
+    plus length and tone converters.
     """
 
     CATEGORY = "🧙 Wizdroid/LLM"
@@ -43,6 +44,9 @@ class WizdroidLLMTextRewriter:
         mode_tooltip = (
             "Rewrite style from data/rewrite/modes.json. "
             "clean_up = grammar/clarity only. custom = custom_instruction. "
+            "qwen_image = official Qwen-Image rewrite() (auto EN/ZH + magic suffix). "
+            "flux_klein = official FLUX.2 [klein] 9B prompt upsampling. "
+            "photo_* = photography rewrites (portrait, editorial, boudoir, …; SFW and NSFW). "
             "Edit the JSON to add/change modes, then refresh the page."
         )
 
@@ -86,7 +90,7 @@ class WizdroidLLMTextRewriter:
                         "step": 0.05,
                         "tooltip": (
                             "LLM temperature. Low (0.1–0.3) for clean_up/formal; "
-                            "raise for fun modes (pirate, drunk, uwu)."
+                            "raise a bit for Qwen-Image / FLUX Klein upsampling."
                         ),
                     },
                 ),
@@ -157,6 +161,7 @@ class WizdroidLLMTextRewriter:
         system_prompt = build_rewrite_system_prompt(
             mode=mode,
             custom_instruction=custom_instruction,
+            text=text,
         )
         user_prompt = build_rewrite_user_prompt(
             text=text,
@@ -189,7 +194,7 @@ class WizdroidLLMTextRewriter:
             logger.error("Ollama text rewrite failed: %s", response)
             return (f"Error: {response}",)
 
-        result = sanitize_rewritten_text(response)
+        result = finish_rewritten_text(response, mode=mode, source_text=text)
         if not result:
             logger.warning("Empty rewrite after sanitize; returning raw response")
             result = (response or "").strip()

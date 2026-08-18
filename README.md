@@ -383,16 +383,59 @@ Output:
 Built-in modes (ids from `data/rewrite/modes.json`):
 
 ```
-clean_up, custom, formalize, easier_to_read, humanize, professionalize,
-less_snark, less_patronizing, less_hostile, shorter, longer, way_longer,
-smarter, relaxed, casual, highschooler_casual, highschooler_essay,
-undergrad_casual, undergrad_essay, tipsy, drunk, pirate, uwu, gigabrain
+clean_up, custom, qwen_image, qwen_image_en, qwen_image_zh, flux_klein,
+flux_klein_edit, photo_portrait, photo_editorial, photo_cinematic,
+photo_candid, photo_studio, photo_beauty, photo_glamour, photo_boudoir,
+photo_figure, photo_technical, formalize, easier_to_read, humanize,
+professionalize, shorter, longer, way_longer, smarter, relaxed, casual,
+undergrad_essay
 ```
 
 `clean_up` only fixes grammar/structure. It does not invent content.
 `custom` follows `custom_instruction`; empty instruction falls back to clean-up rules.
 
-Data: `data/rewrite/modes.json`, `system.json`.
+**Qwen-Image modes** (official [`rewrite()`](https://github.com/QwenLM/Qwen-Image/blob/a76c8a3873c369a097aafd7ea229b7404659043c/src/examples/tools/prompt_utils.py#L183)):
+
+| Mode | What it does |
+|------|----------------|
+| `qwen_image` | Auto EN/ZH (CJK sniff) + official optimizer + magic suffix |
+| `qwen_image_en` | Force English polish + `Ultra HD, 4K, cinematic composition` |
+| `qwen_image_zh` | Force Chinese polish + `超清，4K，电影级构图` |
+
+Wire `text` out into a Qwen-Image sampler. Templates live in
+`data/qwen_image/system.json`.
+
+**FLUX.2 [klein] 9B modes** (official prompt upsampling from the
+[BFL Hugging Face space](https://huggingface.co/spaces/black-forest-labs/FLUX.2-klein-9B)):
+
+| Mode | What it does |
+|------|----------------|
+| `flux_klein` | T2I upsample — more descriptive paragraphs, quoted on-image text, keep subject/intent |
+| `flux_klein_edit` | Edit instruction — one concise 50–80 word instruction (what changes + what stays) |
+
+Klein does **not** auto-enhance prompts, so this mode is the upsampler the
+official 9B demo uses. Templates: `data/flux_klein/system.json`.
+
+**Photography modes** (SFW and NSFW — they keep whatever the source already is,
+and recast it as a shootable photograph):
+
+| Mode | What it does |
+|------|----------------|
+| `photo_portrait` | Face-first portrait: shot scale, eye-line, key/fill/rim |
+| `photo_editorial` | Fashion editorial: silhouette, fabric, styling, location |
+| `photo_cinematic` | One movie still: blocking, lens, motivated light, grade |
+| `photo_candid` | Documentary / street: available light, observed moment |
+| `photo_studio` | Controlled setup: modifiers, Rembrandt / clamshell / etc. |
+| `photo_beauty` | Tight beauty: skin, makeup, catchlights, DOF |
+| `photo_glamour` | Glossy glamour (celebrity cover → adult glamour) |
+| `photo_boudoir` | Intimate in-room: window light, fabric, skin |
+| `photo_figure` | Body as form: pose, volume, figure-study light |
+| `photo_technical` | Same scene, more camera/film/lens language |
+
+Shared SFW/NSFW rules live in `data/rewrite/system.json` (`photography_rules`).
+
+Data: `data/rewrite/modes.json`, `system.json`; model-specific wording in
+`data/qwen_image/system.json` and `data/flux_klein/system.json`.
 
 ---
 
@@ -636,6 +679,8 @@ data/
   prompts/      # image prompt generator + character AI guidance
   character/    # character dropdowns + templates
   portrait/     # high-energy portrait template + slot dropdowns
+  qwen_image/   # official Qwen-Image rewrite() / polish_edit_prompt templates
+  flux_klein/   # official FLUX.2 [klein] 9B prompt upsampling
   scene/        # video scene mood/style + VL/text templates
   vl_extract/   # VL image extract modes + system templates
   lyrics/       # ACE-Step structures, choices, templates
@@ -675,6 +720,8 @@ comfyui-wizdroid-tools/
     vl_extract_prompts.py     # VL image extract modes
     lyrics_prompts.py
     rewrite_prompts.py
+    qwen_image_prompts.py     # official Qwen-Image rewrite / edit polish
+    flux_klein_prompts.py     # official FLUX.2 [klein] 9B upsampling
     presets.py                # discover + format preset catalogs
   nodes/
     llm_prompt_generator.py

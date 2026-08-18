@@ -9,6 +9,104 @@
     "instruction": "Mode: Custom.\nFollow the user's custom instruction carefully when rewriting the text.\nIf the instruction is empty, fall back to clean-up only (grammar/spelling/clarity,\nno new content).",
     "suggested_temperature": 0.55
   },
+  "qwen_image": {
+    "label": "Qwen-Image (auto EN/ZH)",
+    "instruction": "Mode: Official Qwen-Image rewrite().\nAuto-detect English vs Chinese (any CJK character → Chinese).\nExpand the input into a complete image prompt under 200 words, then append the official magic suffix.",
+    "kind": "qwen_image",
+    "language": "auto",
+    "append_magic": true,
+    "suggested_temperature": 0.6
+  },
+  "qwen_image_en": {
+    "label": "Qwen-Image (English)",
+    "instruction": "Mode: Official Qwen-Image polish_prompt_en().\nExpand the input into a complete English image prompt under 200 words, then append: Ultra HD, 4K, cinematic composition.",
+    "kind": "qwen_image",
+    "language": "en",
+    "append_magic": true,
+    "suggested_temperature": 0.6
+  },
+  "qwen_image_zh": {
+    "label": "Qwen-Image (中文)",
+    "instruction": "Mode: Official Qwen-Image polish_prompt_zh().\n将输入扩写为完整中文图像提示词，并追加：超清，4K，电影级构图。",
+    "kind": "qwen_image",
+    "language": "zh",
+    "append_magic": true,
+    "suggested_temperature": 0.6
+  },
+  "flux_klein": {
+    "label": "FLUX.2 Klein 9B",
+    "instruction": "Mode: Official FLUX.2 [klein] 9B prompt upsampling (Hugging Face space SYSTEM_PROMPT_TEXT_ONLY).\nRewrite into a more descriptive image prompt while strictly preserving subject and intent.\nKeep structured inputs structured. Convert natural language to detailed paragraphs.\nQuote any on-image text. Output only the revised prompt.",
+    "kind": "flux_klein",
+    "edit": false,
+    "suggested_temperature": 0.6
+  },
+  "flux_klein_edit": {
+    "label": "FLUX.2 Klein 9B (edit)",
+    "instruction": "Mode: Official FLUX.2 [klein] 9B edit-instruction upsampling (SYSTEM_PROMPT_WITH_IMAGES).\nTurn a short edit request into one concise instruction (50–80 words, ~30 if brief).\nSay what changes and what stays the same. Turn negatives into positives. Output only the instruction.",
+    "kind": "flux_klein",
+    "edit": true,
+    "suggested_temperature": 0.4
+  },
+  "photo_portrait": {
+    "label": "Photo — portrait",
+    "instruction": "Mode: Portrait photography.\nRewrite as a still portrait: face and expression first, then body, wardrobe (or lack of it), hands, and environment.\nSpecify shot scale (tight headshot, beauty, 3/4, environmental), eye-line, and how the face is lit (key, fill, rim, catchlights).\nKeep the person's identity and energy. Suitable for SFW headshots and explicit portraits alike.",
+    "kind": "photography",
+    "suggested_temperature": 0.55
+  },
+  "photo_editorial": {
+    "label": "Photo — fashion editorial",
+    "instruction": "Mode: Fashion editorial photography.\nRewrite as a magazine editorial frame: silhouette, garments, fabrics, styling, pose attitude, location, and fashion-photographer lighting.\nName materials and how they take light. Wardrobe can be couture, street, lingerie, or nude if the source says so.\nThink Vogue / i-D / Love — high craft, not catalog flatness.",
+    "kind": "photography",
+    "suggested_temperature": 0.6
+  },
+  "photo_cinematic": {
+    "label": "Photo — cinematic still",
+    "instruction": "Mode: Cinematic still / film frame.\nRewrite as a single movie still: blocking, lens language (anamorphic, 35mm, 85mm), motivated lighting, color grade, atmosphere, and production design.\nDescribe the moment as if it is one locked-off frame from a scene, not a collage of keywords.\nWorks for clothed drama and explicit scenes — keep the heat if it is already there.",
+    "kind": "photography",
+    "suggested_temperature": 0.6
+  },
+  "photo_candid": {
+    "label": "Photo — candid / documentary",
+    "instruction": "Mode: Candid / documentary / street photography.\nRewrite as an unposed or barely-posed observed moment: available light, real locations, slight motion, imperfect framing, lived-in detail.\nAvoid studio-perfect beauty lighting unless the source is already a studio shot.\nIf the source is intimate or sexual, treat it as documentary intimacy, not a posed glamour plate.",
+    "kind": "photography",
+    "suggested_temperature": 0.55
+  },
+  "photo_studio": {
+    "label": "Photo — studio lighting",
+    "instruction": "Mode: Studio photography.\nRewrite around a controlled lighting setup: key / fill / rim / kicker, modifiers (softbox, beauty dish, grid, snoot, flags), seamless or set background, and how light sculpts face, body, and fabric.\nName the setup (Rembrandt, butterfly, split, clamshell, rim-heavy) when it fits.\nBackground is usually simple unless the source specifies a set. SFW and NSFW both get the same lighting rigor.",
+    "kind": "photography",
+    "suggested_temperature": 0.5
+  },
+  "photo_beauty": {
+    "label": "Photo — beauty close-up",
+    "instruction": "Mode: Beauty / cosmetics close-up.\nRewrite as a tight beauty frame: skin texture, makeup, eyes, lips, brows, hair edge, catchlights, and shallow depth of field.\nSpecify finish (dewy, matte, oily, wet) and how light hits pores, highlighter, and lips.\nIf the source is explicit, you may include mouth, chest, or body as beauty-detail photography — still keep it a close-up craft shot, not a story.",
+    "kind": "photography",
+    "suggested_temperature": 0.55
+  },
+  "photo_glamour": {
+    "label": "Photo — glamour",
+    "instruction": "Mode: Classic glamour photography.\nRewrite as a glamorous still: flattering light, hair and makeup emphasis, shine on skin, jewelry, wardrobe that reads expensive or seductive, confident pose.\nOld-Hollywood, modern celebrity, or adult glamour depending on the source.\nDo not flatten explicit sources into G-rated Hollywood — keep the heat and shoot it like a glossy cover.",
+    "kind": "photography",
+    "suggested_temperature": 0.6
+  },
+  "photo_boudoir": {
+    "label": "Photo — boudoir / intimate",
+    "instruction": "Mode: Boudoir and intimate photography.\nRewrite as an intimate in-room photograph: bed, hotel, bathroom, window light, fabric, skin, lingerie or nudity as given.\nSoft directional light, private atmosphere, body language that feels close, not performative unless the source is performative.\nScale with the source: tasteful lingerie stay tasteful; explicit sex acts stay explicit and still photographic.",
+    "kind": "photography",
+    "suggested_temperature": 0.6
+  },
+  "photo_figure": {
+    "label": "Photo — figure / body",
+    "instruction": "Mode: Figure, physique, and fine-art body photography.\nRewrite around the body as form: pose, muscle and fat, skin, gesture, negative space, and how light models volume.\nClothed, implied nude, or fully nude/explicit according to the source — describe anatomy when it is visible.\nThink studio figure study, fitness plate, or erotic body landscape, matching the source energy.",
+    "kind": "photography",
+    "suggested_temperature": 0.55
+  },
+  "photo_technical": {
+    "label": "Photo — camera / film language",
+    "instruction": "Mode: Technical photography rewrite.\nKeep the scene, but recast it with concrete camera language: format (35mm, 645, 4x5, digital FF), focal length, aperture and depth of field, shutter/motion, ISO/grain, film stock or sensor look, white balance, and lens character (glow, falloff, anamorphic flare).\nDo not drown the subject. The photograph still has to be about the person or scene — tech supports it.\nWorks on SFW and NSFW subjects the same way.",
+    "kind": "photography",
+    "suggested_temperature": 0.45
+  },
   "formalize": {
     "label": "Formalize",
     "instruction": "Mode: Formalize.\nRewrite in polished, formal language suitable for professional or academic contexts.\nUse complete sentences, proper grammar, and avoid slang or contractions when possible.\nKeep the same meaning; do not pad with empty formalities.",
@@ -28,21 +126,6 @@
     "label": "Professional-ize",
     "instruction": "Mode: Professional-ize.\nRewrite for a workplace / business audience: confident, clear, and concise.\nAvoid slang, hostility, and excessive casual tone.\nKeep the same requests, facts, and decisions.",
     "suggested_temperature": 0.2
-  },
-  "less_snark": {
-    "label": "Less snark",
-    "instruction": "Mode: Less snark.\nRemove sarcasm, eye-rolling, and cutting asides. Keep a direct but respectful tone.\nDo not change the underlying message.",
-    "suggested_temperature": 0.4
-  },
-  "less_patronizing": {
-    "label": "Less patronizing",
-    "instruction": "Mode: Less patronizing.\nRemove condescension, talking-down, and over-explaining that treats the reader as\nincapable. Stay helpful and equal in tone.",
-    "suggested_temperature": 0.4
-  },
-  "less_hostile": {
-    "label": "Less hostile",
-    "instruction": "Mode: Less hostile.\nSoften aggression, insults, and combative wording while preserving the speaker's\nactual position and requests.",
-    "suggested_temperature": 0.4
   },
   "shorter": {
     "label": "Shorter",
@@ -74,49 +157,9 @@
     "instruction": "Mode: Casual.\nEveryday conversational tone: natural contractions, informal but readable prose.\nNot crude, not essay-formal.",
     "suggested_temperature": 0.4
   },
-  "highschooler_casual": {
-    "label": "Highschooler (casual)",
-    "instruction": "Mode: Highschooler (casual).\nSound like a typical high-school student texting/talking: simple vocab, informal\nrhythm, occasional youthful phrasing. Still grammatical enough to read cleanly.",
-    "suggested_temperature": 0.55
-  },
-  "highschooler_essay": {
-    "label": "Highschooler essay",
-    "instruction": "Mode: Highschooler essay.\nRewrite as a solid high-school essay voice: basic thesis-style clarity, simple\ntransitions, school-appropriate formality — not graduate-level jargon.",
-    "suggested_temperature": 0.4
-  },
-  "undergrad_casual": {
-    "label": "Undergrad (casual)",
-    "instruction": "Mode: Undergrad (casual).\nCollege-student casual: reasonably articulate, lightly informal, aware but not\ncorporate. Natural campus-adult voice.",
-    "suggested_temperature": 0.55
-  },
   "undergrad_essay": {
     "label": "Undergrad essay",
     "instruction": "Mode: Undergrad essay.\nUndergraduate academic prose: clearer structure, more precise vocabulary, mild\nanalytical tone. Not overly stiff or journal-level.",
     "suggested_temperature": 0.4
-  },
-  "tipsy": {
-    "label": "Tipsy",
-    "instruction": "Mode: Tipsy.\nSlightly looser, warmer, a bit rambling and cheerful — as if one drink in.\nStill mostly coherent; do not garble meaning.",
-    "suggested_temperature": 0.85
-  },
-  "drunk": {
-    "label": "Drunk",
-    "instruction": "Mode: Drunk.\nMessier rhythm, emotional digressions, imperfect focus — but keep the original\npoints recognizable. Fun caricature, not pure gibberish.",
-    "suggested_temperature": 0.85
-  },
-  "pirate": {
-    "label": "Pirate",
-    "instruction": "Mode: Pirate.\nRewrite in classic pirate speak (arr, ye, matey, etc.) while keeping the same\nmeaning. Stay playful, not unreadable.",
-    "suggested_temperature": 0.85
-  },
-  "uwu": {
-    "label": "UwU",
-    "instruction": "Mode: UwU.\nCute, soft internet \"uwu\" voice (gentle wording, playful elongations where natural).\nDo not destroy readability entirely; keep the meaning intact.",
-    "suggested_temperature": 0.85
-  },
-  "gigabrain": {
-    "label": "Gigabrain",
-    "instruction": "Mode: Gigabrain.\nHyper-intellectual, slightly over-the-top smart-person voice: dense vocabulary,\nlayered phrasing, analytical flair. Still map to the original meaning; avoid\nmeaningless buzzword soup.",
-    "suggested_temperature": 0.85
   }
 }
