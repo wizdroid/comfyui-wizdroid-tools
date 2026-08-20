@@ -25,6 +25,8 @@ Includes:
 - VL Image Extract: vision-language reverse of a source image into a prompt,
   outfit flatlay, makeup description, or other selectable extract mode
   (spice-aware NSFW).
+- Sampler × Scheduler Sweep: sequential KSampler grid with GPU cooldown
+  and the pair name burned onto each saved image.
 - Presets: plugin-style non-AI nodes — one node per catalog JSON under
   ``data/presets/`` (parts/, sets/female, sets/male, sets/unisex), each
   placed in a category derived from its folder. Drop a new JSON into a
@@ -124,6 +126,11 @@ _web_image_node = _import_node_module("wizdroid_image_from_url")
 WEB_IMAGE_NODE_CLASS_MAPPINGS = _web_image_node.NODE_CLASS_MAPPINGS
 WEB_IMAGE_NODE_DISPLAY_NAME_MAPPINGS = _web_image_node.NODE_DISPLAY_NAME_MAPPINGS
 
+# Sequential sampler × scheduler sweep with cooldown and labeled saves.
+_sweep_node = _import_node_module("sampler_scheduler_sweep")
+SWEEP_NODE_CLASS_MAPPINGS = _sweep_node.NODE_CLASS_MAPPINGS
+SWEEP_NODE_DISPLAY_NAME_MAPPINGS = _sweep_node.NODE_DISPLAY_NAME_MAPPINGS
+
 # Extract text from a website and generate a character image prompt via Ollama.
 _website_prompt_nodes = _import_node_module("llm_website_prompt")
 WEBSITE_PROMPT_NODE_CLASS_MAPPINGS = _website_prompt_nodes.NODE_CLASS_MAPPINGS
@@ -137,7 +144,7 @@ BATCH_CAPTION_NODE_DISPLAY_NAME_MAPPINGS = _batch_caption_nodes.NODE_DISPLAY_NAM
 # Vision critique of a generated image → revised prompt.
 _critique_nodes = _import_node_module("llm_image_critique")
 CRITIQUE_NODE_CLASS_MAPPINGS = _critique_nodes.NODE_CLASS_MAPPINGS
-CRITIQUE_NODE_DISPLAY_NAME_MAPPINGS = _critique_nodes.NODE_DISPLAY_NAME_MAPPINGS
+CRITIQUE_DISPLAY_NAME_MAPPINGS = _critique_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
 # Iterative image prompt refiner (optional VL + in-session memory).
 _refiner_nodes = _import_node_module("llm_image_refiner")
@@ -160,6 +167,7 @@ NODE_CLASS_MAPPINGS = {
     **VL_EXTRACT_NODE_CLASS_MAPPINGS,
     **PRESET_NODE_CLASS_MAPPINGS,
     **WEB_IMAGE_NODE_CLASS_MAPPINGS,
+    **SWEEP_NODE_CLASS_MAPPINGS,
     **WEBSITE_PROMPT_NODE_CLASS_MAPPINGS,
     **BATCH_CAPTION_NODE_CLASS_MAPPINGS,
     **CRITIQUE_NODE_CLASS_MAPPINGS,
@@ -178,6 +186,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **VL_EXTRACT_DISPLAY_NAME_MAPPINGS,
     **PRESET_NODE_DISPLAY_NAME_MAPPINGS,
     **WEB_IMAGE_NODE_DISPLAY_NAME_MAPPINGS,
+    **SWEEP_NODE_DISPLAY_NAME_MAPPINGS,
     **WEBSITE_PROMPT_NODE_DISPLAY_NAME_MAPPINGS,
     **BATCH_CAPTION_NODE_DISPLAY_NAME_MAPPINGS,
     **CRITIQUE_NODE_DISPLAY_NAME_MAPPINGS,
