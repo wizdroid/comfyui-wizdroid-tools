@@ -144,7 +144,7 @@ BATCH_CAPTION_NODE_DISPLAY_NAME_MAPPINGS = _batch_caption_nodes.NODE_DISPLAY_NAM
 # Vision critique of a generated image → revised prompt.
 _critique_nodes = _import_node_module("llm_image_critique")
 CRITIQUE_NODE_CLASS_MAPPINGS = _critique_nodes.NODE_CLASS_MAPPINGS
-CRITIQUE_DISPLAY_NAME_MAPPINGS = _critique_nodes.NODE_DISPLAY_NAME_MAPPINGS
+CRITIQUE_NODE_DISPLAY_NAME_MAPPINGS = _critique_nodes.NODE_DISPLAY_NAME_MAPPINGS
 
 # Iterative image prompt refiner (optional VL + in-session memory).
 _refiner_nodes = _import_node_module("llm_image_refiner")
