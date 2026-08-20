@@ -15,6 +15,7 @@ from typing import Any, Dict, List
 
 from lib.json_data import load_data_json
 from lib.flux_klein_prompts import build_flux_klein_messages
+from lib.krea_prompts import build_krea_messages
 from lib.qwen_image_prompts import (
     append_magic,
     build_rewrite_messages,
@@ -47,6 +48,10 @@ _DEFAULT_SYSTEM: Dict[str, Any] = {
     ),
     "photography_user_header": (
         "Rewrite the following into a photography image prompt using mode: {label}."
+    ),
+    "photography_escalate_rules": (
+        "You MAY add adult sexual content. Keep the same adult subject and setting. "
+        "Never invent minors or illegal content. Do not refuse."
     ),
     "user_prompt_template": "{header}\n\n---\n{text}\n---\n\nRewritten text:",
     "strip_prefixes": [
@@ -81,7 +86,6 @@ def _load_system() -> Dict[str, Any]:
     data = load_data_json("rewrite", "system.json", default=None)
     if not isinstance(data, dict):
         return dict(_DEFAULT_SYSTEM)
-    # Merge so missing keys still work if user trims the file
     merged = dict(_DEFAULT_SYSTEM)
     merged.update(data)
     return merged
@@ -111,17 +115,17 @@ def _load_modes() -> Dict[str, Dict[str, Any]]:
             entry["append_magic"] = bool(val["append_magic"])
         if "edit" in val:
             entry["edit"] = bool(val["edit"])
+        if "escalate_nsfw" in val:
+            entry["escalate_nsfw"] = bool(val["escalate_nsfw"])
         out[str(key)] = entry
     return out or {k: dict(v) for k, v in _DEFAULT_MODES.items()}
 
 
 def get_rewrite_modes() -> Dict[str, Dict[str, Any]]:
-    """Return current mode map (reloads when modes.json changes)."""
     return _load_modes()
 
 
 def get_rewrite_mode_choices() -> List[str]:
-    """Ordered mode ids for the ComfyUI dropdown."""
     modes = _load_modes()
     system = _load_system()
     order = system.get("mode_order") or []
@@ -131,7 +135,6 @@ def get_rewrite_mode_choices() -> List[str]:
         if key in modes and key not in seen:
             choices.append(key)
             seen.add(key)
-    # Any modes not listed in mode_order still appear (so new JSON keys show up)
     for key in modes:
         if key not in seen:
             choices.append(key)
@@ -140,7 +143,6 @@ def get_rewrite_mode_choices() -> List[str]:
 
 
 def get_rewrite_mode_labels() -> Dict[str, str]:
-    """Map mode id -> human label."""
     return {k: v["label"] for k, v in _load_modes().items()}
 
 
@@ -155,20 +157,17 @@ def _resolve_mode_key(mode: str) -> str:
 
 
 def is_qwen_image_mode(mode: str) -> bool:
-    """True for official Qwen-Image rewrite() modes."""
     modes = _load_modes()
     data = modes.get((mode or "").strip()) or {}
     return data.get("kind") == "qwen_image"
 
 
 def __getattr__(name: str):
-    """Lazy dynamic attributes for dropdown lists (re-read JSON on access)."""
     if name == "REWRITE_MODE_CHOICES":
         return get_rewrite_mode_choices()
     if name == "REWRITE_MODE_LABELS":
         return get_rewrite_mode_labels()
     if name == "REWRITE_MODES":
-        # legacy shape: id -> (label, instruction)
         return {
             k: (v["label"], v["instruction"]) for k, v in _load_modes().items()
         }
@@ -180,14 +179,11 @@ def build_rewrite_system_prompt(
     custom_instruction: str = "",
     text: str = "",
 ) -> str:
-    """Build the system prompt for the selected rewrite mode."""
     system = _load_system()
     modes = _load_modes()
     mode_key = _resolve_mode_key(mode)
     mode_data = modes[mode_key]
 
-    # Official image-model optimizers use their own system prompt, not the
-    # generic rewriter rules (those would fight "infer and add details").
     if mode_data.get("kind") == "qwen_image":
         sys_txt, _, _ = build_rewrite_messages(
             text,
@@ -208,10 +204,21 @@ def build_rewrite_system_prompt(
             sys_txt = f"{sys_txt}\n\nAdditional user instruction:\n{custom}"
         return sys_txt
 
+    if mode_data.get("kind") == "krea":
+        sys_txt, _ = build_krea_messages(text)
+        custom = (custom_instruction or "").strip()
+        if custom:
+            sys_txt = f"{sys_txt}\n\nAdditional user instruction:\n{custom}"
+        return sys_txt
+
     if mode_data.get("kind") == "photography":
+        if mode_data.get("escalate_nsfw"):
+            rules = (system.get("photography_escalate_rules") or "").strip()
+        else:
+            rules = (system.get("photography_rules") or "").strip()
         parts = [
             (system.get("photography_base") or "").strip(),
-            (system.get("photography_rules") or "").strip(),
+            rules,
             mode_data["instruction"].strip(),
         ]
         custom = (custom_instruction or "").strip()
@@ -228,7 +235,6 @@ def build_rewrite_system_prompt(
         if custom:
             parts.append(f"Custom instruction:\n{custom}")
         else:
-            # Fall back to clean_up instruction when custom text is empty
             fallback = modes.get("clean_up") or next(iter(modes.values()))
             parts.append(fallback["instruction"].strip())
     elif custom:
@@ -245,7 +251,6 @@ def build_rewrite_user_prompt(
     mode: str = "clean_up",
     custom_instruction: str = "",
 ) -> str:
-    """Wrap raw user text in a mode-aware rewrite instruction."""
     system = _load_system()
     modes = _load_modes()
     mode_key = _resolve_mode_key(mode)
@@ -263,6 +268,10 @@ def build_rewrite_user_prompt(
             text,
             edit=bool(mode_data.get("edit")),
         )
+        return user
+
+    if mode_data.get("kind") == "krea":
+        _, user = build_krea_messages(text)
         return user
 
     label = mode_data["label"]
@@ -299,7 +308,6 @@ def build_rewrite_user_prompt(
 
 
 def sanitize_rewritten_text(response: str) -> str:
-    """Strip common LLM wrappers (fences, labels, surrounding quotes)."""
     result = (response or "").strip()
     if not result:
         return ""
@@ -332,11 +340,6 @@ def finish_rewritten_text(
     mode: str = "clean_up",
     source_text: str = "",
 ) -> str:
-    """Sanitize LLM output and apply mode-specific finishing.
-
-    Qwen-Image modes collapse newlines (official rewrite()) and append the
-    Ultra HD / 超清 magic suffix.
-    """
     result = sanitize_rewritten_text(response)
     if not result:
         return ""
@@ -344,7 +347,12 @@ def finish_rewritten_text(
     modes = _load_modes()
     mode_key = _resolve_mode_key(mode)
     mode_data = modes.get(mode_key) or {}
-    if mode_data.get("kind") != "qwen_image":
+    kind = mode_data.get("kind")
+
+    if kind in ("krea", "photography"):
+        return re.sub(r"\s+", " ", result).strip()
+
+    if kind != "qwen_image":
         return result
 
     result = re.sub(r"\s+", " ", result).strip()
@@ -355,7 +363,6 @@ def finish_rewritten_text(
 
 
 def suggested_temperature(mode: str) -> float:
-    """Suggested temperature from modes.json (or a safe default)."""
     modes = _load_modes()
     system = _load_system()
     default_mode = system.get("default_mode") or "clean_up"
