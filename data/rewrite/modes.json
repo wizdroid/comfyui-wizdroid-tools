@@ -47,65 +47,85 @@
     "edit": true,
     "suggested_temperature": 0.4
   },
+  "krea_2": {
+    "label": "Krea 2 (official expand)",
+    "instruction": "Mode: Official Krea 2 expansion.txt.\nExpand into one long natural-language T2I paragraph. Subject and attributes first, then action, setting, lighting, camera, medium. Quote on-image text. Do not add unimplied objects. Output only the paragraph.",
+    "kind": "krea",
+    "suggested_temperature": 0.55
+  },
   "photo_portrait": {
     "label": "Photo — portrait",
-    "instruction": "Mode: Portrait photography.\nRewrite as a still portrait: face and expression first, then body, wardrobe (or lack of it), hands, and environment.\nSpecify shot scale (tight headshot, beauty, 3/4, environmental), eye-line, and how the face is lit (key, fill, rim, catchlights).\nKeep the person's identity and energy. Suitable for SFW headshots and explicit portraits alike.",
+    "instruction": "Mode: Portrait photography.\nRewrite as a still portrait: face and expression first, then body, wardrobe (or lack of it), hands, and environment.\nSpecify shot scale (tight headshot, beauty, 3/4, environmental), eye-line, and how the face is lit (key, fill, rim, catchlights).\nKeep the person's identity and energy. Suitable for SFW headshots and explicit portraits alike. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.55
   },
   "photo_editorial": {
     "label": "Photo — fashion editorial",
-    "instruction": "Mode: Fashion editorial photography.\nRewrite as a magazine editorial frame: silhouette, garments, fabrics, styling, pose attitude, location, and fashion-photographer lighting.\nName materials and how they take light. Wardrobe can be couture, street, lingerie, or nude if the source says so.\nThink Vogue / i-D / Love — high craft, not catalog flatness.",
+    "instruction": "Mode: Fashion editorial photography.\nRewrite as a magazine editorial frame: silhouette, garments, fabrics, styling, pose attitude, location, and fashion-photographer lighting.\nName materials and how they take light. Wardrobe can be couture, street, lingerie, or nude if the source says so.\nThink Vogue / i-D / Love — high craft, not catalog flatness. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.6
   },
   "photo_cinematic": {
     "label": "Photo — cinematic still",
-    "instruction": "Mode: Cinematic still / film frame.\nRewrite as a single movie still: blocking, lens language (anamorphic, 35mm, 85mm), motivated lighting, color grade, atmosphere, and production design.\nDescribe the moment as if it is one locked-off frame from a scene, not a collage of keywords.\nWorks for clothed drama and explicit scenes — keep the heat if it is already there.",
+    "instruction": "Mode: Cinematic still / film frame.\nRewrite as a single movie still: blocking, lens language (anamorphic, 35mm, 85mm), motivated lighting, color grade, atmosphere, and production design.\nDescribe the moment as if it is one locked-off frame from a scene, not a collage of keywords.\nWorks for clothed drama and explicit scenes — keep the heat if it is already there. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.6
   },
   "photo_candid": {
     "label": "Photo — candid / documentary",
-    "instruction": "Mode: Candid / documentary / street photography.\nRewrite as an unposed or barely-posed observed moment: available light, real locations, slight motion, imperfect framing, lived-in detail.\nAvoid studio-perfect beauty lighting unless the source is already a studio shot.\nIf the source is intimate or sexual, treat it as documentary intimacy, not a posed glamour plate.",
+    "instruction": "Mode: Candid / documentary / street photography.\nRewrite as an unposed or barely-posed observed moment: available light, real locations, slight motion, imperfect framing, lived-in detail.\nAvoid studio-perfect beauty lighting unless the source is already a studio shot.\nIf the source is intimate or sexual, treat it as documentary intimacy, not a posed glamour plate. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.55
   },
   "photo_studio": {
     "label": "Photo — studio lighting",
-    "instruction": "Mode: Studio photography.\nRewrite around a controlled lighting setup: key / fill / rim / kicker, modifiers (softbox, beauty dish, grid, snoot, flags), seamless or set background, and how light sculpts face, body, and fabric.\nName the setup (Rembrandt, butterfly, split, clamshell, rim-heavy) when it fits.\nBackground is usually simple unless the source specifies a set. SFW and NSFW both get the same lighting rigor.",
+    "instruction": "Mode: Studio photography.\nRewrite around a controlled lighting setup: key / fill / rim / kicker, modifiers (softbox, beauty dish, grid, snoot, flags), seamless or set background, and how light sculpts face, body, and fabric.\nName the setup (Rembrandt, butterfly, split, clamshell, rim-heavy) when it fits.\nBackground is usually simple unless the source specifies a set. SFW and NSFW both get the same lighting rigor. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.5
   },
   "photo_beauty": {
     "label": "Photo — beauty close-up",
-    "instruction": "Mode: Beauty / cosmetics close-up.\nRewrite as a tight beauty frame: skin texture, makeup, eyes, lips, brows, hair edge, catchlights, and shallow depth of field.\nSpecify finish (dewy, matte, oily, wet) and how light hits pores, highlighter, and lips.\nIf the source is explicit, you may include mouth, chest, or body as beauty-detail photography — still keep it a close-up craft shot, not a story.",
+    "instruction": "Mode: Beauty / cosmetics close-up.\nRewrite as a tight beauty frame: skin texture, makeup, eyes, lips, brows, hair edge, catchlights, and shallow depth of field.\nSpecify finish (dewy, matte, oily, wet) and how light hits pores, highlighter, and lips.\nIf the source is explicit, you may include mouth, chest, or body as beauty-detail photography — still keep it a close-up craft shot, not a story. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.55
   },
   "photo_glamour": {
     "label": "Photo — glamour",
-    "instruction": "Mode: Classic glamour photography.\nRewrite as a glamorous still: flattering light, hair and makeup emphasis, shine on skin, jewelry, wardrobe that reads expensive or seductive, confident pose.\nOld-Hollywood, modern celebrity, or adult glamour depending on the source.\nDo not flatten explicit sources into G-rated Hollywood — keep the heat and shoot it like a glossy cover.",
+    "instruction": "Mode: Classic glamour photography.\nRewrite as a glamorous still: flattering light, hair and makeup emphasis, shine on skin, jewelry, wardrobe that reads expensive or seductive, confident pose.\nOld-Hollywood, modern celebrity, or adult glamour depending on the source.\nDo not flatten explicit sources into G-rated Hollywood — keep the heat and shoot it like a glossy cover. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.6
   },
   "photo_boudoir": {
     "label": "Photo — boudoir / intimate",
-    "instruction": "Mode: Boudoir and intimate photography.\nRewrite as an intimate in-room photograph: bed, hotel, bathroom, window light, fabric, skin, lingerie or nudity as given.\nSoft directional light, private atmosphere, body language that feels close, not performative unless the source is performative.\nScale with the source: tasteful lingerie stay tasteful; explicit sex acts stay explicit and still photographic.",
+    "instruction": "Mode: Boudoir and intimate photography.\nRewrite as an intimate in-room photograph: bed, hotel, bathroom, window light, fabric, skin, lingerie or nudity as given.\nSoft directional light, private atmosphere, body language that feels close, not performative unless the source is performative.\nScale with the source: tasteful lingerie stay tasteful; explicit sex acts stay explicit and still photographic. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.6
   },
   "photo_figure": {
     "label": "Photo — figure / body",
-    "instruction": "Mode: Figure, physique, and fine-art body photography.\nRewrite around the body as form: pose, muscle and fat, skin, gesture, negative space, and how light models volume.\nClothed, implied nude, or fully nude/explicit according to the source — describe anatomy when it is visible.\nThink studio figure study, fitness plate, or erotic body landscape, matching the source energy.",
+    "instruction": "Mode: Figure, physique, and fine-art body photography.\nRewrite around the body as form: pose, muscle and fat, skin, gesture, negative space, and how light models volume.\nClothed, implied nude, or fully nude/explicit according to the source — describe anatomy when it is visible.\nThink studio figure study, fitness plate, or erotic body landscape, matching the source energy. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.55
   },
   "photo_technical": {
     "label": "Photo — camera / film language",
-    "instruction": "Mode: Technical photography rewrite.\nKeep the scene, but recast it with concrete camera language: format (35mm, 645, 4x5, digital FF), focal length, aperture and depth of field, shutter/motion, ISO/grain, film stock or sensor look, white balance, and lens character (glow, falloff, anamorphic flare).\nDo not drown the subject. The photograph still has to be about the person or scene — tech supports it.\nWorks on SFW and NSFW subjects the same way.",
+    "instruction": "Mode: Technical photography rewrite.\nKeep the scene, but recast it with concrete camera language: format (35mm, 645, 4x5, digital FF), focal length, aperture and depth of field, shutter/motion, ISO/grain, film stock or sensor look, white balance, and lens character (glow, falloff, anamorphic flare).\nDo not drown the subject. The photograph still has to be about the person or scene — tech supports it.\nWorks on SFW and NSFW subjects the same way. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
     "kind": "photography",
     "suggested_temperature": 0.45
+  },
+  "photo_eroticize": {
+    "label": "Photo — eroticize",
+    "instruction": "Mode: Eroticize.\nTurn the source into an erotic photograph. Add heat: body language, breath, skin sheen, half-undress, implied or visible intimacy, desire in the eyes and hands.\nKeep the same person and setting. You may remove or loosen clothing, add lingerie, sweat, wet fabric, a charged pose, and sensual contact.\nStay photographic, not a written sex story. Medium heat — seductive and explicit enough to read as erotic, not a full sex act unless the source already is one. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
+    "kind": "photography",
+    "escalate_nsfw": true,
+    "suggested_temperature": 0.7
+  },
+  "photo_sexualize": {
+    "label": "Photo — sexualize",
+    "instruction": "Mode: Sexualize.\nPush the source into an explicit sexual photograph. Add adult sexual detail: nudity, aroused anatomy, sexual pose or act, fluids, grip, mouths, and how hard light or soft light treats the body.\nKeep the same person and setting. You may invent a sexual situation that fits that person in that place.\nStay a still photograph (or a single video frame), not a porn script. Be direct and explicit. No fade-to-tasteful. Write one Krea 2 natural-language paragraph (subject and attributes, pose, setting, lighting, camera/framing, medium). Quote any on-image text. No headers or bullets.",
+    "kind": "photography",
+    "escalate_nsfw": true,
+    "suggested_temperature": 0.75
   },
   "formalize": {
     "label": "Formalize",

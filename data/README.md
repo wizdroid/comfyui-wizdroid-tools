@@ -30,6 +30,8 @@ data/
 │   └── system.json          # EN/ZH optimizer templates + magic suffixes
 ├── flux_klein/              # Official FLUX.2 [klein] 9B prompt upsampling
 │   └── system.json          # T2I + edit system prompts from the BFL HF space
+├── krea/                    # Official Krea 2 expansion.txt
+│   └── system.json
 ├── rewrite/                 # LLM Text Rewriter
 │   ├── modes.json           # mode_id → label, instruction, suggested_temperature
 │   └── system.json          # base system, output rules, mode_order, templates

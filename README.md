@@ -43,7 +43,8 @@ Default Ollama URL: `http://localhost:11434`.
 
 Class: `WizdroidLLMPromptGenerator`
 
-Takes a short concept and expands it into one image-generation prompt.
+Takes a short concept and expands it into one [Krea 2](https://github.com/krea-ai/krea-2/blob/main/docs/prompting.md)
+natural-language image prompt (subject → pose → setting → lighting → camera).
 
 | Input | Type | Notes |
 |-------|------|--------|
@@ -78,8 +79,9 @@ Build a character from dropdowns and free text, then emit one prompt.
 Two modes:
 
 - `use_ai=True` -- send a character JSON to Ollama, which expands it into a
-  long cinematic portrait prompt (style anchor, materials, lighting, film
-  language, quality + negatives). Spice / fantasy / detail still apply.
+  long [Krea 2](https://github.com/krea-ai/krea-2/blob/main/docs/prompting.md)
+  portrait paragraph (subject, materials, pose, lighting, camera). Spice /
+  fantasy / detail still apply.
 - `use_ai=False` -- concatenate resolved fields into plain English (no LLM)
 
 If Ollama fails in AI mode, the node falls back to the template string and
@@ -147,6 +149,8 @@ Data:
 Class: `WizdroidHighEnergyPortrait`
 
 Fill the **Universal High-Energy Portrait Template** from slot inputs.
+AI mode writes a [Krea 2](https://github.com/krea-ai/krea-2/blob/main/docs/prompting.md)
+natural-language paragraph (subject → light → camera), not labeled sections.
 
 Two modes:
 
@@ -384,9 +388,9 @@ Built-in modes (ids from `data/rewrite/modes.json`):
 
 ```
 clean_up, custom, qwen_image, qwen_image_en, qwen_image_zh, flux_klein,
-flux_klein_edit, photo_portrait, photo_editorial, photo_cinematic,
+flux_klein_edit, krea_2, photo_portrait, photo_editorial, photo_cinematic,
 photo_candid, photo_studio, photo_beauty, photo_glamour, photo_boudoir,
-photo_figure, photo_technical, formalize, easier_to_read, humanize,
+photo_figure, photo_technical, photo_eroticize, photo_sexualize, formalize, easier_to_read, humanize,
 professionalize, shorter, longer, way_longer, smarter, relaxed, casual,
 undergrad_essay
 ```
@@ -416,6 +420,16 @@ Wire `text` out into a Qwen-Image sampler. Templates live in
 Klein does **not** auto-enhance prompts, so this mode is the upsampler the
 official 9B demo uses. Templates: `data/flux_klein/system.json`.
 
+**Krea 2** (official [`expansion.txt`](https://github.com/krea-ai/krea-2/blob/main/docs/expansion.txt)
+from the [prompting guide](https://github.com/krea-ai/krea-2/blob/main/docs/prompting.md)):
+
+| Mode | What it does |
+|------|----------------|
+| `krea_2` | One long natural-language paragraph: subject → attributes → action → setting → lighting → camera → medium. Quote on-image text. |
+
+Photography modes and the High-Energy Portrait AI writer use the same Krea 2
+shape (one cohesive paragraph, no headers).
+
 **Photography modes** (SFW and NSFW — they keep whatever the source already is,
 and recast it as a shootable photograph):
 
@@ -431,11 +445,15 @@ and recast it as a shootable photograph):
 | `photo_boudoir` | Intimate in-room: window light, fabric, skin |
 | `photo_figure` | Body as form: pose, volume, figure-study light |
 | `photo_technical` | Same scene, more camera/film/lens language |
+| `photo_eroticize` | Add heat: sensual pose, skin, half-undress (medium explicit) |
+| `photo_sexualize` | Push explicit: anatomy, sex act, fluids — still a still photo |
 
 Shared SFW/NSFW rules live in `data/rewrite/system.json` (`photography_rules`).
+Output shape follows the Krea 2 guide (one natural-language paragraph).
 
 Data: `data/rewrite/modes.json`, `system.json`; model-specific wording in
-`data/qwen_image/system.json` and `data/flux_klein/system.json`.
+`data/qwen_image/system.json`, `data/flux_klein/system.json`, and
+`data/krea/system.json`.
 
 ---
 
@@ -669,6 +687,41 @@ reference **IMAGE** so the VL model can see what it's iterating on.
 
 ---
 
+### 14. Sampler × Scheduler Sweep
+
+Category: `🧙 Wizdroid/Utils` — non-AI utility node.
+
+Class: `WizdroidSamplerSchedulerSweep`
+
+Run every `sampler × scheduler` pair **one at a time** (not a list-map),
+sleep between combos so the GPU can cool down, burn `sampler | scheduler`
+onto each image, and save:
+
+`output/{prefix}/{sampler}__{scheduler}_00001_.png`
+
+Keep **seed = fixed** so every combo uses the same noise.
+
+| Input | Type | Notes |
+|-------|------|--------|
+| `model` / `positive` / `negative` / `latent_image` / `vae` | sockets | Same as KSampler + decode |
+| `seed` | INT | Use `fixed` for a fair comparison |
+| `steps` / `cfg` / `denoise` | INT / FLOAT | Turbo Krea2: 8 / 1 / 1 |
+| `samplers` | STRING (multiline) | One sampler per line |
+| `schedulers` | STRING (multiline) | One scheduler per line |
+| `cooldown_seconds` | FLOAT | Pause after each combo (default 1s) |
+| `overlay` | BOOLEAN | Stamp the pair name on the image |
+| `filename_prefix` | STRING | Output subfolder, default `krea2-sweep` |
+| `use_all_installed` (opt) | BOOLEAN | Ignore the lists; sweep every installed sampler/scheduler |
+| `skip_names` (opt) | STRING | Always skip these (`dpm_adaptive` etc.) |
+| `continue_on_error` (opt) | BOOLEAN | Skip a failing pair and keep going |
+
+| Output | Type | Meaning |
+|--------|------|---------|
+| `images` | IMAGE | Successful labeled frames, batched |
+| `report` | STRING | `OK` / `FAIL` / `OOM` / `SKIP` per pair |
+
+---
+
 ## Data directory
 
 Nothing important is hard-coded. Edit JSON, save, refresh the ComfyUI page
@@ -681,6 +734,7 @@ data/
   portrait/     # high-energy portrait template + slot dropdowns
   qwen_image/   # official Qwen-Image rewrite() / polish_edit_prompt templates
   flux_klein/   # official FLUX.2 [klein] 9B prompt upsampling
+  krea/         # official Krea 2 expansion.txt
   scene/        # video scene mood/style + VL/text templates
   vl_extract/   # VL image extract modes + system templates
   lyrics/       # ACE-Step structures, choices, templates
@@ -722,6 +776,7 @@ comfyui-wizdroid-tools/
     rewrite_prompts.py
     qwen_image_prompts.py     # official Qwen-Image rewrite / edit polish
     flux_klein_prompts.py     # official FLUX.2 [klein] 9B upsampling
+    krea_prompts.py           # official Krea 2 expansion
     presets.py                # discover + format preset catalogs
   nodes/
     llm_prompt_generator.py

@@ -14,9 +14,8 @@ from lib.prompts import get_detail_prompts, get_fantasy_prompts, get_spice_promp
 
 _FALLBACK_SYSTEM: Dict[str, str] = {
     "system_prompt_template": (
-        "You are a prompt writer for AI image generators. Write a single "
-        "paragraph image prompt describing the character from the website "
-        "information. Max about {max_tokens} words.\n"
+        "You write a Krea 2 natural-language image prompt for the character "
+        "from the website information. Max about {max_tokens} words.\n"
         "{spice_guidance}\n{fantasy_guidance}\n{detail_guidance}"
     ),
     "user_prompt_wrapper": (

@@ -46,7 +46,8 @@ class WizdroidLLMTextRewriter:
             "clean_up = grammar/clarity only. custom = custom_instruction. "
             "qwen_image = official Qwen-Image rewrite() (auto EN/ZH + magic suffix). "
             "flux_klein = official FLUX.2 [klein] 9B prompt upsampling. "
-            "photo_* = photography rewrites (portrait, editorial, boudoir, …; SFW and NSFW). "
+            "krea_2 = official Krea 2 expansion.txt (one natural-language paragraph). "
+            "photo_* = photography rewrites in Krea 2 shape (SFW and NSFW). "
             "Edit the JSON to add/change modes, then refresh the page."
         )
 

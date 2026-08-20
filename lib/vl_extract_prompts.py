@@ -54,7 +54,7 @@ _DEFAULT_MODES: Dict[str, Dict[str, Any]] = {
     "image_prompt": {
         "label": "Image prompt (full reverse)",
         "instruction": (
-            "Mode: Image prompt.\nWrite one paragraph that would recreate this image."
+            "Mode: Image prompt.\nWrite one Krea 2 natural-language paragraph that would recreate this image."
         ),
         "suggested_temperature": 0.35,
         "suggested_max_tokens": 512,

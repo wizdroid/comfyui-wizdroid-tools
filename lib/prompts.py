@@ -25,11 +25,11 @@ _FALLBACK_LEVEL: Dict[int, str] = {
 
 _FALLBACK_SYSTEM = {
     "system_prompt_template": (
-        "You write image prompts.\n"
+        "You write Krea 2 image prompts as one natural-language paragraph.\n"
         "Max about {max_tokens} words.\n"
         "{spice_guidance}\n{fantasy_guidance}\n{detail_guidance}"
     ),
-    "user_prompt_wrapper": "Expand this idea into an image prompt:\n\n{concept}",
+    "user_prompt_wrapper": "Expand this idea into a Krea 2 image prompt:\n\n{concept}",
 }
 
 

@@ -1,7 +1,7 @@
 {
   "image_prompt": {
     "label": "Image prompt (full reverse)",
-    "instruction": "Mode: Image prompt (full reverse).\nWrite ONE single-paragraph image-generation prompt that would recreate this frame as closely as possible.\nInclude subject, pose, face/expression, hair, body, clothing (or lack of clothing), makeup, accessories, props, setting, lighting, camera framing, and art/media style when visible.\nDo not use section headers or bullet lists. No \"a photo of\" fluff unless it improves model quality.\nAt high spice: include explicit anatomical / sexual detail when present in the image.",
+    "instruction": "Mode: Image prompt (full reverse).\nWrite ONE Krea 2 natural-language paragraph that would recreate this frame as closely as possible.\nOrder: subject and attributes, pose, setting, lighting (quality, direction, color), camera/framing, medium/style.\nInclude face/expression, hair, body, clothing (or lack of clothing), makeup, accessories, and props when visible.\nQuote any words that appear in the image. No section headers, bullets, or keyword soup.\nAt high spice: include explicit anatomical / sexual detail when present in the image.",
     "suggested_temperature": 0.35,
     "suggested_max_tokens": 512
   },
@@ -55,7 +55,7 @@
   },
   "full_character": {
     "label": "Full character appearance",
-    "instruction": "Mode: Full character appearance.\nWrite a comprehensive character appearance block covering: demographics presentation, face, eyes, expression, hair, body, pose, full wardrobe, makeup, jewelry, tattoos/markings, accessories, and any held props.\nStay faithful to the image. Output as a dense single paragraph or tightly grouped comma fragments suitable for character prompting.\nAt high spice: include explicit NSFW appearance details when the image shows them.",
+    "instruction": "Mode: Full character appearance.\nWrite a comprehensive Krea 2 natural-language paragraph covering: demographics presentation, face, eyes, expression, hair, body, pose, full wardrobe, makeup, jewelry, tattoos/markings, accessories, and any held props.\nStay faithful to the image. One cohesive paragraph — not a comma-tag dump.\nAt high spice: include explicit NSFW appearance details when the image shows them.",
     "suggested_temperature": 0.35,
     "suggested_max_tokens": 640
   },
