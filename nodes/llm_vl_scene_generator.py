@@ -10,7 +10,7 @@ import logging
 from typing import Any, Dict, Tuple
 
 from lib.constants import DEFAULT_OLLAMA_URL
-from lib.ollama_client import collect_models, generate_with_image
+from lib.ollama_client import collect_vision_models, generate_with_image
 from lib.scene_prompts import (
     build_vl_system_prompt,
     build_vl_user_prompt,
@@ -45,7 +45,7 @@ class WizdroidVLSceneGenerator:
 
     @classmethod
     def INPUT_TYPES(cls) -> Dict[str, Any]:
-        models = collect_models(DEFAULT_OLLAMA_URL)
+        models = collect_vision_models(DEFAULT_OLLAMA_URL)
         moods = get_mood_choices()
         styles = get_style_choices()
         video_models = get_video_model_choices()

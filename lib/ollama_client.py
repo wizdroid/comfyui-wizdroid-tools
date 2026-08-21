@@ -18,7 +18,7 @@ try:
 except ImportError:  # pragma: no cover
     requests = None
 
-from .constants import DEFAULT_OLLAMA_URL, THINKING_MODEL_PREFIXES
+from .constants import DEFAULT_OLLAMA_URL, THINKING_MODEL_PREFIXES, VISION_MODEL_PREFIXES
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,32 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 _MODELS_CACHE: Dict[str, List[str]] = {}
 _MODELS_CACHE_TIME: Dict[str, float] = {}
+_VISION_MODELS_CACHE: Dict[str, List[str]] = {}
+_VISION_MODELS_CACHE_TIME: Dict[str, float] = {}
 _MODELS_TTL = 60.0
+
+
+def _fetch_tag_entries(ollama_url: str) -> Tuple[str, List[Dict[str, Any]]]:
+    """Fetch raw ``/api/tags`` model entries.
+
+    Returns:
+        ``(status, entries)`` where status is ``"ok"``,
+        ``"model_not_available"`` (HTTP != 200 / bad JSON), or
+        ``"ollama_not_running"`` (connection error).
+    """
+    if requests is None:
+        return "ollama_not_running", []
+    try:
+        resp = requests.get(f"{ollama_url.rstrip('/')}/api/tags", timeout=5)
+    except Exception:  # noqa: BLE001
+        return "ollama_not_running", []
+    if resp.status_code != 200:
+        return "model_not_available", []
+    try:
+        data = resp.json()
+    except Exception:  # noqa: BLE001
+        return "model_not_available", []
+    return "ok", list(data.get("models", []))
 
 
 def collect_models(ollama_url: str, use_cache: bool = True) -> List[str]:
@@ -53,22 +78,74 @@ def collect_models(ollama_url: str, use_cache: bool = True) -> List[str]:
         if cached and (time.time() - cache_time) < _MODELS_TTL:
             return cached
 
-    try:
-        resp = requests.get(f"{ollama_url.rstrip('/')}/api/tags", timeout=5)
-        if resp.status_code != 200:
-            fallback = _MODELS_CACHE.get(cache_key)
-            return fallback or ["model_not_available"]
-        data = resp.json()
-        result = [m.get("name", "unknown") for m in data.get("models", [])]
-        if not result:
-            result = ["no_models_found"]
+    status, entries = _fetch_tag_entries(ollama_url)
+    if status != "ok":
+        fallback = _MODELS_CACHE.get(cache_key)
+        return fallback or [status]
 
-        _MODELS_CACHE[cache_key] = result
-        _MODELS_CACHE_TIME[cache_key] = time.time()
-        return result
+    result = [m.get("name", "unknown") for m in entries]
+    if not result:
+        result = ["no_models_found"]
 
-    except Exception:  # noqa: BLE001
-        return _MODELS_CACHE.get(cache_key) or ["ollama_not_running"]
+    _MODELS_CACHE[cache_key] = result
+    _MODELS_CACHE_TIME[cache_key] = time.time()
+    return result
+
+
+def _is_vision_model_name(model: str) -> bool:
+    """Heuristic vision check from the model name.
+
+    Fallback for older Ollama servers that don't report
+    ``details.capabilities`` in ``/api/tags``.
+    """
+    model_lower = model.lower()
+    return any(prefix in model_lower for prefix in VISION_MODEL_PREFIXES)
+
+
+def collect_vision_models(ollama_url: str, use_cache: bool = True) -> List[str]:
+    """Discover vision-capable models (e.g. llava, qwen2.5-vl, gemma3).
+
+    Filters ``/api/tags`` by ``details.capabilities`` containing ``"vision"``
+    when the server reports capabilities; falls back to name matching
+    otherwise. Used by VL nodes so the dropdown only shows models that can
+    actually accept an image.
+    """
+    global _VISION_MODELS_CACHE, _VISION_MODELS_CACHE_TIME
+
+    if requests is None:
+        return ["install_requests_library"]
+
+    cache_key = ollama_url
+
+    if use_cache:
+        cached = _VISION_MODELS_CACHE.get(cache_key)
+        cache_time = _VISION_MODELS_CACHE_TIME.get(cache_key, 0)
+        if cached and (time.time() - cache_time) < _MODELS_TTL:
+            return cached
+
+    status, entries = _fetch_tag_entries(ollama_url)
+    if status != "ok":
+        fallback = _VISION_MODELS_CACHE.get(cache_key)
+        return fallback or [status]
+
+    result: List[str] = []
+    for m in entries:
+        name = m.get("name", "unknown")
+        details = m.get("details") or {}
+        caps = details.get("capabilities") or []
+        if isinstance(caps, list) and caps:
+            # Modern Ollama reports capabilities; trust it.
+            if "vision" in caps:
+                result.append(name)
+        elif _is_vision_model_name(name):
+            result.append(name)
+
+    if not result:
+        result = ["no_vision_models_found"]
+
+    _VISION_MODELS_CACHE[cache_key] = result
+    _VISION_MODELS_CACHE_TIME[cache_key] = time.time()
+    return result
 
 
 def _is_thinking_model(model: str) -> bool:
@@ -108,7 +185,7 @@ def _build_generate_options(
         opts["seed"] = seed
         opts["random_seed"] = seed
     if _is_thinking_model(model):
-        opts["think"] = 0
+        opts["think"] = False
     return opts
 
 
@@ -258,7 +335,7 @@ def generate_text(
     while done_reason == "length" and budget < MAX_RETRY_TOKENS:
         budget = min(budget * 4, MAX_RETRY_TOKENS)
         opts["num_predict"] = budget
-        opts["think"] = 0
+        opts["think"] = False
         ok2, raw2, data2 = _do_request(opts)
         if not ok2 or not isinstance(data2, dict):
             break

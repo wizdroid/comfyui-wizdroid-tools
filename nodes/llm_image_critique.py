@@ -21,7 +21,7 @@ from lib.critique_prompts import (
     mode_meta,
     parse_critique_response,
 )
-from lib.ollama_client import collect_models, generate_with_image
+from lib.ollama_client import collect_vision_models, generate_with_image
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class WizdroidImageCritique:
 
     @classmethod
     def INPUT_TYPES(cls) -> Dict[str, Any]:
-        models = collect_models(DEFAULT_OLLAMA_URL)
+        models = collect_vision_models(DEFAULT_OLLAMA_URL)
         mode_ids = get_critique_mode_choices()
         labels = get_critique_mode_labels()
         mode_labels = [labels.get(m, m) for m in mode_ids]

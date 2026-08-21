@@ -14,7 +14,7 @@ import logging
 from typing import Any, Dict, Tuple
 
 from lib.constants import DEFAULT_OLLAMA_URL
-from lib.ollama_client import collect_models, generate_with_image
+from lib.ollama_client import collect_vision_models, generate_with_image
 from lib.vl_extract_prompts import (
     build_extract_system_prompt,
     build_extract_user_prompt,
@@ -49,7 +49,7 @@ class WizdroidVLExtract:
 
     @classmethod
     def INPUT_TYPES(cls) -> Dict[str, Any]:
-        models = collect_models(DEFAULT_OLLAMA_URL)
+        models = collect_vision_models(DEFAULT_OLLAMA_URL)
         mode_ids = get_extract_mode_choices()
         labels = get_extract_mode_labels()
         # Show human labels in the dropdown; resolve back to id at runtime.
